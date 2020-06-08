@@ -14,3 +14,30 @@
 # ==============================================================================
 """A server that runs FFmpeg on files in Google Cloud Storage.
 """
+
+import subprocess
+
+from flask import Flask
+from flask import request
+
+app = Flask(__name__)
+
+
+@app.route('/ffmpeg', methods=['POST'])
+def process_ffmpeg_command():
+    """Runs ffmpeg according to the request's specification.
+
+    The POST request supports the following arguments:
+        input_file: the input file in the Google Cloud Bucket specified
+        output_file: the output file that should be stored in the Google Cloud Bucket
+
+    Args:
+
+    Returns:
+        A string with the ffmpeg logs.
+    """
+    input_file = request.form['input_file']
+    output_file = request.form['output_file']
+    return subprocess.run(["ffmpeg", "-i", input_file, output_file],
+                          stdout=subprocess.PIPE,
+                          stderr=subprocess.STDOUT).stdout
