@@ -16,12 +16,12 @@
 """
 
 import os
+import pathlib
 import subprocess
-from typing import Tuple
+import tempfile
 
 from flask import Flask
 from flask import request
-from flask import safe_join
 from google.cloud import storage
 from google.cloud.exceptions import NotFound
 
@@ -49,38 +49,35 @@ def process_ffmpeg_command():
         A string with the ffmpeg logs.
     """
     remote_input_file = request.form['input_file']
-    local_input_file = _localize_filename(remote_input_file)
-    download_file(local_input_file, remote_input_file)
+    input_format = pathlib.PurePath(remote_input_file).suffix
     remote_output_file = request.form['output_file']
-    local_output_file = _localize_filename(remote_output_file)
-
-    ffmpeg_logs = subprocess.run(
-        ["ffmpeg", "-i", local_input_file, local_output_file],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        check=False).stdout
-    os.remove(local_input_file)
-    upload_file(local_output_file, remote_output_file)
-    os.remove(local_output_file)
+    output_format = pathlib.PurePath(remote_output_file).suffix
+    with tempfile.NamedTemporaryFile(suffix=input_format) as input_file:
+        with tempfile.NamedTemporaryFile(suffix=output_format) as output_file:
+            download_file(remote_input_file, input_file.name)
+            ffmpeg_logs = subprocess.run(
+                ["ffmpeg", "-y", "-i", input_file.name, output_file.name],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                check=False).stdout
+            upload_file(output_file.name, remote_output_file)
     return ffmpeg_logs
 
 
-def download_file(local_filename: str, remote_filename: str) -> None:
+def download_file(remote_filename: str, local_filename: str) -> None:
     """Downloads the file from Google Cloud Storage
 
     This function downloads the file to the /tmp directory.
 
     Args:
-        local_filename: the filepath of the downloaded file
-        remote_filename: the filename preceded by the Google Cloud Bucket name
+        local_filename: The filepath of the downloaded file
+        remote_filename: A GCS output file path
                          Example: bucket_name/path/to/file
 
     Returns:
         None
     """
     client = storage.Client()
-    local_filename = _localize_filename(remote_filename)
-    os.makedirs(os.path.dirname(local_filename), exist_ok=True)
     with open(local_filename, 'wb') as downloaded_file:
         client.download_blob_to_file('gs://' + remote_filename, downloaded_file)
 
@@ -99,23 +96,7 @@ def upload_file(local_filename: str, remote_filename: str) -> None:
         None
     """
     client = storage.Client()
-    bucket_name, blob_name = _split_remote_filename(remote_filename)
+    bucket_name, blob_name = os.path.normpath(remote_filename).split('/', 1)
     bucket = client.bucket(bucket_name)
     blob = bucket.blob(blob_name)
     blob.upload_from_filename(local_filename)
-
-
-def _split_remote_filename(remote_filename: str) -> Tuple[str, str]:
-    """Splits a remote filename into a bucket and a blob name."""
-    split_path = os.path.normpath(remote_filename).split('/', 1)
-    bucket_name = split_path[0] if len(split_path) >= 1 else ""
-    blob_name = split_path[1] if len(split_path) >= 2 else ""
-    return bucket_name, blob_name
-
-
-def _localize_filename(filename: str) -> str:
-    """Takes a remote filename and returns its local counterpart.
-
-    Throws an exception if the filename falls out of the directory.
-    """
-    return safe_join('/tmp/', filename)
