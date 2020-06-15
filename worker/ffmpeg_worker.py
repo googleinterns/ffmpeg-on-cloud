@@ -38,15 +38,12 @@ def process_ffmpeg_command():
     """Runs ffmpeg according to the request's specification.
 
     The POST request supports the following arguments:
-        input_file: the input file in the Google Cloud Bucket specified
+        input_file: A GCS input file path
                     Example: bucket_name/path/to/file
-        output_file: the output file that should be stored in the
-                     Google Cloud Bucket specified
+        output_file: A GCS output file path
                      Example: bucket_name/path/to/file
     This route changes the video container format by running the following:
         ffmpeg -i {input_file} {output_file}
-
-    Args:
 
     Returns:
         A string with the ffmpeg logs.
@@ -94,8 +91,8 @@ def upload_file(local_filename: str, remote_filename: str) -> None:
     This function uploads the file to the Google Cloud Bucket specified.
 
     Args:
-        local_filename: the filepath of the local file to upload
-        remote_filename: the filename preceded by the Google Cloud Bucket name
+        local_filename: The filepath of the local file to upload
+        remote_filename: A GCS output file path
                          Example: bucket_name/path/to/file
 
     Returns:
