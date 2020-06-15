@@ -56,7 +56,7 @@ def process_ffmpeg_command():
         with tempfile.NamedTemporaryFile(suffix=output_format) as output_file:
             download_file(remote_input_file, input_file.name)
             ffmpeg_logs = subprocess.run(
-                ["ffmpeg", "-y", "-i", input_file.name, output_file.name],
+                ['ffmpeg', '-i', input_file.name, '-y', output_file.name],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 check=False).stdout
