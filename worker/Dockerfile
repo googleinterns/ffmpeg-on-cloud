@@ -8,6 +8,6 @@ COPY . .
 RUN pip install --requirement requirements.txt
 
 ENV FLASK_APP ffmpeg_worker.py
-CMD [ "flask", "run", "--port=8080", "--host=0.0.0.0" ]
+CMD [ "python3", "ffmpeg_worker.py" ]
 
 EXPOSE 8080

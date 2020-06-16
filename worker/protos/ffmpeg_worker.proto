@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+service FFmpeg {
+  rpc transcode(Request) returns (Log) {}
+}
+
+message Log {
+  string text = 1;
+}
+
+message Request {
+// A GCS input file path
+// Example: bucket_name/path/to/file
+  string input_filename = 1;
+
+// A GCS output file path
+// Example: bucket_name/path/to/file
+  string output_filename = 2;
+}

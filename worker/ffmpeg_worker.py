@@ -15,53 +15,52 @@
 """A server that runs FFmpeg on files in Google Cloud Storage.
 """
 
+from concurrent import futures
+import logging
 import os
 import pathlib
 import subprocess
 import tempfile
 
-from flask import Flask
-from flask import request
 from google.cloud import storage
 from google.cloud.exceptions import NotFound
+import grpc
 
-app = Flask(__name__)
-
-
-@app.errorhandler(NotFound)
-def _handle_gcloud_not_found(_):
-    return 'Google Cloud storage object not found', 404
+from ffmpeg_worker_pb2 import Request, Log
+import ffmpeg_worker_pb2_grpc
 
 
-@app.route('/ffmpeg', methods=['POST'])
-def process_ffmpeg_command():
-    """Runs ffmpeg according to the request's specification.
+class FFmpegServicer(ffmpeg_worker_pb2_grpc.FFmpegServicer):
+    """Implements FFmpeg service"""
 
-    The POST request supports the following arguments:
-        input_file: A GCS input file path
-                    Example: bucket_name/path/to/file
-        output_file: A GCS output file path
-                     Example: bucket_name/path/to/file
-    This route changes the video container format by running the following:
-        ffmpeg -i {input_file} {output_file}
+    def transcode(self, request: Request, context) -> Log:
+        """Runs ffmpeg according to the request's specification.
 
-    Returns:
-        A string with the ffmpeg logs.
-    """
-    remote_input_file = request.form['input_file']
-    input_format = pathlib.PurePath(remote_input_file).suffix
-    remote_output_file = request.form['output_file']
-    output_format = pathlib.PurePath(remote_output_file).suffix
-    with tempfile.NamedTemporaryFile(suffix=input_format) as input_file:
-        with tempfile.NamedTemporaryFile(suffix=output_format) as output_file:
-            download_file(remote_input_file, input_file.name)
-            ffmpeg_logs = subprocess.run(
-                ['ffmpeg', '-i', input_file.name, '-y', output_file.name],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                check=False).stdout
-            upload_file(output_file.name, remote_output_file)
-    return ffmpeg_logs
+        This changes the video container format by running the following:
+            ffmpeg -i {request.input_filename} {request.output_filename}
+
+        Args:
+            request: The FFmpeg request.
+            context: The gRPC context.
+
+        Returns:
+            A string with the ffmpeg logs.
+        """
+        remote_input_file = request.input_filename
+        input_format = pathlib.PurePath(remote_input_file).suffix
+        remote_output_file = request.output_filename
+        output_format = pathlib.PurePath(remote_output_file).suffix
+        with tempfile.NamedTemporaryFile(suffix=input_format) as input_file:
+            with tempfile.NamedTemporaryFile(
+                    suffix=output_format) as output_file:
+                download_file(remote_input_file, input_file.name)
+                ffmpeg_logs = subprocess.run(
+                    ['ffmpeg', '-i', input_file.name, '-y', output_file.name],
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    check=False).stdout
+                upload_file(output_file.name, remote_output_file)
+        return Log(text=ffmpeg_logs)
 
 
 def download_file(remote_filename: str, local_filename: str) -> None:
@@ -100,3 +99,18 @@ def upload_file(local_filename: str, remote_filename: str) -> None:
     bucket = client.bucket(bucket_name)
     blob = bucket.blob(blob_name)
     blob.upload_from_filename(local_filename)
+
+
+def serve():
+    """Starts the gRPC server"""
+    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+    ffmpeg_worker_pb2_grpc.add_FFmpegServicer_to_server(FFmpegServicer(),
+                                                        server)
+    server.add_insecure_port('[::]:8080')
+    server.start()
+    server.wait_for_termination()
+
+
+if __name__ == '__main__':
+    logging.basicConfig()
+    serve()
