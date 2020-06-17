@@ -13,7 +13,7 @@ class FFmpegStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.transcode = channel.unary_unary(
+        self.transcode = channel.unary_stream(
                 '/FFmpeg/transcode',
                 request_serializer=ffmpeg__worker__pb2.Request.SerializeToString,
                 response_deserializer=ffmpeg__worker__pb2.Log.FromString,
@@ -32,7 +32,7 @@ class FFmpegServicer(object):
 
 def add_FFmpegServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'transcode': grpc.unary_unary_rpc_method_handler(
+            'transcode': grpc.unary_stream_rpc_method_handler(
                     servicer.transcode,
                     request_deserializer=ffmpeg__worker__pb2.Request.FromString,
                     response_serializer=ffmpeg__worker__pb2.Log.SerializeToString,
@@ -57,7 +57,7 @@ class FFmpeg(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/FFmpeg/transcode',
+        return grpc.experimental.unary_stream(request, target, '/FFmpeg/transcode',
             ffmpeg__worker__pb2.Request.SerializeToString,
             ffmpeg__worker__pb2.Log.FromString,
             options, channel_credentials,

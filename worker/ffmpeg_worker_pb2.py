@@ -18,7 +18,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=b'\n\x13\x66\x66mpeg_worker.proto\"\x13\n\x03Log\x12\x0c\n\x04text\x18\x01 \x01(\t\":\n\x07Request\x12\x16\n\x0einput_filename\x18\x01 \x01(\t\x12\x17\n\x0foutput_filename\x18\x02 \x01(\t2\'\n\x06\x46\x46mpeg\x12\x1d\n\ttranscode\x12\x08.Request\x1a\x04.Log\"\x00\x62\x06proto3'
+  serialized_pb=b'\n\x13\x66\x66mpeg_worker.proto\"\x13\n\x03Log\x12\x0c\n\x04text\x18\x01 \x01(\t\":\n\x07Request\x12\x16\n\x0einput_filename\x18\x01 \x01(\t\x12\x17\n\x0foutput_filename\x18\x02 \x01(\t2)\n\x06\x46\x46mpeg\x12\x1f\n\ttranscode\x12\x08.Request\x1a\x04.Log\"\x00\x30\x01\x62\x06proto3'
 )
 
 
@@ -119,7 +119,7 @@ _FFMPEG = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   serialized_start=104,
-  serialized_end=143,
+  serialized_end=145,
   methods=[
   _descriptor.MethodDescriptor(
     name='transcode',

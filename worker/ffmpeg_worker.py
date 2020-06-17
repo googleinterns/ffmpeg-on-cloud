@@ -21,9 +21,10 @@ import os
 import pathlib
 import subprocess
 import tempfile
+from typing import Iterator
+from typing import List
 
 from google.cloud import storage
-from google.cloud.exceptions import NotFound
 import grpc
 
 from ffmpeg_worker_pb2 import Request, Log
@@ -54,13 +55,29 @@ class FFmpegServicer(ffmpeg_worker_pb2_grpc.FFmpegServicer):
             with tempfile.NamedTemporaryFile(
                     suffix=output_format) as output_file:
                 download_file(remote_input_file, input_file.name)
-                ffmpeg_logs = subprocess.run(
-                    ['ffmpeg', '-i', input_file.name, '-y', output_file.name],
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.STDOUT,
-                    check=False).stdout
+                for stdout_data in run_process(
+                    ['ffmpeg', '-i', input_file.name, '-y', output_file.name]):
+                    yield Log(text=stdout_data)
                 upload_file(output_file.name, remote_output_file)
-        return Log(text=ffmpeg_logs)
+
+
+def run_process(command: List[str]) -> Iterator[str]:
+    """Runs the process specified and iterates over the output.
+
+    Args:
+        command: The command to run
+                 Example: ['command', 'argument-1', 'argument-2']
+
+    Yields:
+        A line of the command's output.
+    """
+    with subprocess.Popen(command,
+                          stdout=subprocess.PIPE,
+                          stderr=subprocess.STDOUT,
+                          universal_newlines=True,
+                          bufsize=1) as pipe:
+        for line in pipe.stdout:
+            yield line
 
 
 def download_file(remote_filename: str, local_filename: str) -> None:
