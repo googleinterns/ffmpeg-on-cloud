@@ -18,7 +18,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=b'\n\x13\x66\x66mpeg_worker.proto\"\x13\n\x03Log\x12\x0c\n\x04text\x18\x01 \x01(\t\":\n\x07Request\x12\x16\n\x0einput_filename\x18\x01 \x01(\t\x12\x17\n\x0foutput_filename\x18\x02 \x01(\t2)\n\x06\x46\x46mpeg\x12\x1f\n\ttranscode\x12\x08.Request\x1a\x04.Log\"\x00\x30\x01\x62\x06proto3'
+  serialized_pb=b'\n\x13\x66\x66mpeg_worker.proto\"\x13\n\x03Log\x12\x0c\n\x04text\x18\x01 \x01(\t\"4\n\x07Request\x12\x18\n\x10\x66\x66mpeg_arguments\x18\x01 \x03(\t\x12\x0f\n\x07\x62uckets\x18\x02 \x03(\t2)\n\x06\x46\x46mpeg\x12\x1f\n\ttranscode\x12\x08.Request\x1a\x04.Log\"\x00\x30\x01\x62\x06proto3'
 )
 
 
@@ -63,16 +63,16 @@ _REQUEST = _descriptor.Descriptor(
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='input_filename', full_name='Request.input_filename', index=0,
-      number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
+      name='ffmpeg_arguments', full_name='Request.ffmpeg_arguments', index=0,
+      number=1, type=9, cpp_type=9, label=3,
+      has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='output_filename', full_name='Request.output_filename', index=1,
-      number=2, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
+      name='buckets', full_name='Request.buckets', index=1,
+      number=2, type=9, cpp_type=9, label=3,
+      has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
@@ -89,7 +89,7 @@ _REQUEST = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=44,
-  serialized_end=102,
+  serialized_end=96,
 )
 
 DESCRIPTOR.message_types_by_name['Log'] = _LOG
@@ -118,8 +118,8 @@ _FFMPEG = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
-  serialized_start=104,
-  serialized_end=145,
+  serialized_start=98,
+  serialized_end=139,
   methods=[
   _descriptor.MethodDescriptor(
     name='transcode',

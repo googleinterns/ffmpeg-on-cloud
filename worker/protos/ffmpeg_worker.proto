@@ -9,11 +9,10 @@ message Log {
 }
 
 message Request {
-// A GCS input file path
-// Example: bucket_name/path/to/file
-  string input_filename = 1;
+  // The ffmpeg arguments to pass in.
+  // Example: ["-i", "bucket_name/input_file", "bucket_name/output_file"]
+  repeated string ffmpeg_arguments = 1;
 
-// A GCS output file path
-// Example: bucket_name/path/to/file
-  string output_filename = 2;
+  // The names of the buckets that are used in the ffmpeg_arguments.
+  repeated string buckets = 2;
 }
