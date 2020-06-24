@@ -15,9 +15,10 @@ RUN BUILD_DEPS='lsb-release curl gnupg' \
     && apt-get purge -y $BUILD_DEPS \
     && rm -rf /var/lib/apt/lists/*
 
-COPY . .
+COPY requirements.txt .
 RUN pip install --requirement requirements.txt
 
+COPY . .
 RUN adduser ffmpeg-worker --system --no-create-home --disabled-password --disabled-login --ingroup daemon
 CMD [ "python3", "ffmpeg_worker.py" ]
 
