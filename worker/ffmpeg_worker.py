@@ -23,15 +23,15 @@ from typing import Iterator
 from google.cloud import storage
 import grpc
 
-from ffmpeg_worker_pb2 import Request
-from ffmpeg_worker_pb2 import Log
+from ffmpeg_worker_pb2 import FFmpegRequest
+from ffmpeg_worker_pb2 import FFmpegResponse
 import ffmpeg_worker_pb2_grpc
 
 
 class FFmpegServicer(ffmpeg_worker_pb2_grpc.FFmpegServicer):  # pylint: disable=too-few-public-methods
     """Implements FFmpeg service"""
 
-    def transcode(self, request: Request, context) -> Log:
+    def transcode(self, request: FFmpegRequest, context) -> FFmpegResponse:
         """Runs ffmpeg according to the request's specification.
 
         Args:
@@ -42,10 +42,10 @@ class FFmpegServicer(ffmpeg_worker_pb2_grpc.FFmpegServicer):  # pylint: disable=
             A Log object with a line of ffmpeg's output.
         """
         for stdout_data in run_ffmpeg(request):
-            yield Log(text=stdout_data)
+            yield FFmpegResponse(log_line=stdout_data)
 
 
-def run_ffmpeg(request: Request) -> Iterator[str]:
+def run_ffmpeg(request: FFmpegRequest) -> Iterator[str]:
     """Runs ffmpeg according to the request and iterates over the output.
 
     Args:

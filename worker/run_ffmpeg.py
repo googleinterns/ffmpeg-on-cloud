@@ -29,7 +29,7 @@ UNPRIVILEGED_USER = 'ffmpeg-worker'
 
 def main():
     """Runs ffmpeg with GCS files according to the request passed through stdin."""
-    request = ffmpeg_worker_pb2.Request()
+    request = ffmpeg_worker_pb2.FFmpegRequest()
     request.ParseFromString(bytes.fromhex(sys.stdin.read()))
     with tempfile.TemporaryDirectory() as mount_point:
         _demote_privilege(UNPRIVILEGED_USER, mount_point)

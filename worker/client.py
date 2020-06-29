@@ -25,7 +25,7 @@ import sys
 
 import grpc
 
-from ffmpeg_worker_pb2 import Request
+from ffmpeg_worker_pb2 import FFmpegRequest
 import ffmpeg_worker_pb2_grpc
 
 
@@ -37,8 +37,8 @@ def main():
     buckets = sys.argv[1:delimiter_index]
     ffmpeg_arguments = sys.argv[delimiter_index + 1:]
     for line in stub.transcode(
-            Request(ffmpeg_arguments=ffmpeg_arguments, buckets=buckets)):
-        print(line.text, end='')
+            FFmpegRequest(ffmpeg_arguments=ffmpeg_arguments, buckets=buckets)):
+        print(line.log_line, end='')
 
 
 if __name__ == '__main__':

@@ -18,26 +18,28 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=b'\n\x13\x66\x66mpeg_worker.proto\"\x13\n\x03Log\x12\x0c\n\x04text\x18\x01 \x01(\t\"4\n\x07Request\x12\x18\n\x10\x66\x66mpeg_arguments\x18\x01 \x03(\t\x12\x0f\n\x07\x62uckets\x18\x02 \x03(\t2)\n\x06\x46\x46mpeg\x12\x1f\n\ttranscode\x12\x08.Request\x1a\x04.Log\"\x00\x30\x01\x62\x06proto3'
+  create_key=_descriptor._internal_create_key,
+  serialized_pb=b'\n\x13\x66\x66mpeg_worker.proto\"\"\n\x0e\x46\x46mpegResponse\x12\x10\n\x08log_line\x18\x01 \x01(\t\":\n\rFFmpegRequest\x12\x18\n\x10\x66\x66mpeg_arguments\x18\x01 \x03(\t\x12\x0f\n\x07\x62uckets\x18\x02 \x03(\t2:\n\x06\x46\x46mpeg\x12\x30\n\ttranscode\x12\x0e.FFmpegRequest\x1a\x0f.FFmpegResponse\"\x00\x30\x01\x62\x06proto3'
 )
 
 
 
 
-_LOG = _descriptor.Descriptor(
-  name='Log',
-  full_name='Log',
+_FFMPEGRESPONSE = _descriptor.Descriptor(
+  name='FFmpegResponse',
+  full_name='FFmpegResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
+  create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='text', full_name='Log.text', index=0,
+      name='log_line', full_name='FFmpegResponse.log_line', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -51,31 +53,32 @@ _LOG = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=23,
-  serialized_end=42,
+  serialized_end=57,
 )
 
 
-_REQUEST = _descriptor.Descriptor(
-  name='Request',
-  full_name='Request',
+_FFMPEGREQUEST = _descriptor.Descriptor(
+  name='FFmpegRequest',
+  full_name='FFmpegRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
+  create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='ffmpeg_arguments', full_name='Request.ffmpeg_arguments', index=0,
+      name='ffmpeg_arguments', full_name='FFmpegRequest.ffmpeg_arguments', index=0,
       number=1, type=9, cpp_type=9, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='buckets', full_name='Request.buckets', index=1,
+      name='buckets', full_name='FFmpegRequest.buckets', index=1,
       number=2, type=9, cpp_type=9, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -88,27 +91,27 @@ _REQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=44,
-  serialized_end=96,
+  serialized_start=59,
+  serialized_end=117,
 )
 
-DESCRIPTOR.message_types_by_name['Log'] = _LOG
-DESCRIPTOR.message_types_by_name['Request'] = _REQUEST
+DESCRIPTOR.message_types_by_name['FFmpegResponse'] = _FFMPEGRESPONSE
+DESCRIPTOR.message_types_by_name['FFmpegRequest'] = _FFMPEGREQUEST
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
-Log = _reflection.GeneratedProtocolMessageType('Log', (_message.Message,), {
-  'DESCRIPTOR' : _LOG,
+FFmpegResponse = _reflection.GeneratedProtocolMessageType('FFmpegResponse', (_message.Message,), {
+  'DESCRIPTOR' : _FFMPEGRESPONSE,
   '__module__' : 'ffmpeg_worker_pb2'
-  # @@protoc_insertion_point(class_scope:Log)
+  # @@protoc_insertion_point(class_scope:FFmpegResponse)
   })
-_sym_db.RegisterMessage(Log)
+_sym_db.RegisterMessage(FFmpegResponse)
 
-Request = _reflection.GeneratedProtocolMessageType('Request', (_message.Message,), {
-  'DESCRIPTOR' : _REQUEST,
+FFmpegRequest = _reflection.GeneratedProtocolMessageType('FFmpegRequest', (_message.Message,), {
+  'DESCRIPTOR' : _FFMPEGREQUEST,
   '__module__' : 'ffmpeg_worker_pb2'
-  # @@protoc_insertion_point(class_scope:Request)
+  # @@protoc_insertion_point(class_scope:FFmpegRequest)
   })
-_sym_db.RegisterMessage(Request)
+_sym_db.RegisterMessage(FFmpegRequest)
 
 
 
@@ -118,17 +121,19 @@ _FFMPEG = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
-  serialized_start=98,
-  serialized_end=139,
+  create_key=_descriptor._internal_create_key,
+  serialized_start=119,
+  serialized_end=177,
   methods=[
   _descriptor.MethodDescriptor(
     name='transcode',
     full_name='FFmpeg.transcode',
     index=0,
     containing_service=None,
-    input_type=_REQUEST,
-    output_type=_LOG,
+    input_type=_FFMPEGREQUEST,
+    output_type=_FFMPEGRESPONSE,
     serialized_options=None,
+    create_key=_descriptor._internal_create_key,
   ),
 ])
 _sym_db.RegisterServiceDescriptor(_FFMPEG)

@@ -1,14 +1,14 @@
 syntax = "proto3";
 
 service FFmpeg {
-  rpc transcode(Request) returns (stream Log) {}
+  rpc transcode(FFmpegRequest) returns (stream FFmpegResponse) {}
 }
 
-message Log {
-  string text = 1;
+message FFmpegResponse {
+  string log_line = 1;
 }
 
-message Request {
+message FFmpegRequest {
   // The ffmpeg arguments to pass in.
   // Example: ["-i", "bucket_name/input_file", "bucket_name/output_file"]
   repeated string ffmpeg_arguments = 1;
