@@ -20,6 +20,8 @@ RUN pip install --requirement requirements.txt
 
 COPY . .
 RUN adduser ffmpeg-worker --system --no-create-home --disabled-password --disabled-login --ingroup daemon
+USER ffmpeg-worker
+
 CMD [ "python3", "ffmpeg_worker.py" ]
 
 EXPOSE 8080

@@ -17,10 +17,12 @@
 
 from concurrent import futures
 import logging
+import os
 import subprocess
+import tempfile
 from typing import Iterator
+from typing import List
 
-from google.cloud import storage
 import grpc
 
 from ffmpeg_worker_pb2 import FFmpegRequest
@@ -54,16 +56,40 @@ def run_ffmpeg(request: FFmpegRequest) -> Iterator[str]:
     Yields:
         A line of ffmpeg's output.
     """
-    with subprocess.Popen(['python3', 'run_ffmpeg.py'],
-                          stdin=subprocess.PIPE,
-                          stdout=subprocess.PIPE,
-                          stderr=subprocess.STDOUT,
-                          universal_newlines=True,
-                          bufsize=1) as pipe:
-        pipe.stdin.write(request.SerializeToString().hex())
-        pipe.stdin.close()
-        for line in pipe.stdout:
-            yield line
+    with tempfile.TemporaryDirectory() as mount_point:
+        os.chdir(mount_point)
+        try:
+            _mount_buckets(request.buckets)
+            with subprocess.Popen(['ffmpeg', *request.ffmpeg_arguments],
+                                  stdout=subprocess.PIPE,
+                                  stderr=subprocess.STDOUT,
+                                  universal_newlines=True,
+                                  bufsize=1) as pipe:
+                for line in pipe.stdout:
+                    yield line
+        finally:
+            _unmount_buckets(request.buckets)
+
+
+def _mount_buckets(buckets: List[str]) -> None:
+    """Mounts GCS buckets in the current directory.
+
+    Args:
+        buckets: The names of the buckets to mount.
+    """
+    for bucket in buckets:
+        os.mkdir(bucket)
+        subprocess.run(['gcsfuse', bucket, bucket], check=True)
+
+
+def _unmount_buckets(buckets: List[str]) -> None:
+    """Unmounts GCS buckets in the current directory.
+
+    Args:
+        buckets: The names of the buckets to unmount.
+    """
+    for bucket in buckets:
+        subprocess.run(['fusermount', '-u', bucket], check=True)
 
 
 def serve():
