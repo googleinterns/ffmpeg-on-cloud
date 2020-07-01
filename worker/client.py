@@ -15,10 +15,10 @@
 """Client CLI for interacting with FFmpeg worker.
 
 The usage of the CLI is the following:
-python3 client.py gcs-bucket ... -- ffmpeg-argument ...
+python3 client.py ffmpeg-argument ...
 
 The following is a sample command:
-python3 client.py my-bucket-1 my-bucket-2 -- -i my-bucket-1/input.mp4 my-bucket-2/output.avi
+python3 client.py -i my-bucket-1/input.mp4 my-bucket-2/output.avi
 """
 
 import sys
@@ -31,13 +31,11 @@ import ffmpeg_worker_pb2_grpc
 
 def main():
     """Main driver for CLI."""
+    ffmpeg_arguments = sys.argv[1:]
     channel = grpc.insecure_channel('localhost:8080')
     stub = ffmpeg_worker_pb2_grpc.FFmpegStub(channel)
-    delimiter_index = sys.argv.index('--', 1)
-    buckets = sys.argv[1:delimiter_index]
-    ffmpeg_arguments = sys.argv[delimiter_index + 1:]
     for line in stub.transcode(
-            FFmpegRequest(ffmpeg_arguments=ffmpeg_arguments, buckets=buckets)):
+            FFmpegRequest(ffmpeg_arguments=ffmpeg_arguments)):
         print(line.log_line, end='')
 
 

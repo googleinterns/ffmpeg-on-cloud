@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x13\x66\x66mpeg_worker.proto\"\"\n\x0e\x46\x46mpegResponse\x12\x10\n\x08log_line\x18\x01 \x01(\t\":\n\rFFmpegRequest\x12\x18\n\x10\x66\x66mpeg_arguments\x18\x01 \x03(\t\x12\x0f\n\x07\x62uckets\x18\x02 \x03(\t2:\n\x06\x46\x46mpeg\x12\x30\n\ttranscode\x12\x0e.FFmpegRequest\x1a\x0f.FFmpegResponse\"\x00\x30\x01\x62\x06proto3'
+  serialized_pb=b'\n\x13\x66\x66mpeg_worker.proto\"\"\n\x0e\x46\x46mpegResponse\x12\x10\n\x08log_line\x18\x01 \x01(\t\")\n\rFFmpegRequest\x12\x18\n\x10\x66\x66mpeg_arguments\x18\x01 \x03(\t2:\n\x06\x46\x46mpeg\x12\x30\n\ttranscode\x12\x0e.FFmpegRequest\x1a\x0f.FFmpegResponse\"\x00\x30\x01\x62\x06proto3'
 )
 
 
@@ -72,13 +72,6 @@ _FFMPEGREQUEST = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='buckets', full_name='FFmpegRequest.buckets', index=1,
-      number=2, type=9, cpp_type=9, label=3,
-      has_default_value=False, default_value=[],
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -92,7 +85,7 @@ _FFMPEGREQUEST = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=59,
-  serialized_end=117,
+  serialized_end=100,
 )
 
 DESCRIPTOR.message_types_by_name['FFmpegResponse'] = _FFMPEGRESPONSE
@@ -122,8 +115,8 @@ _FFMPEG = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=119,
-  serialized_end=177,
+  serialized_start=102,
+  serialized_end=160,
   methods=[
   _descriptor.MethodDescriptor(
     name='transcode',

@@ -29,6 +29,8 @@ from ffmpeg_worker_pb2 import FFmpegRequest
 from ffmpeg_worker_pb2 import FFmpegResponse
 import ffmpeg_worker_pb2_grpc
 
+MOUNT_POINT = '/buckets/'
+
 
 class FFmpegServicer(ffmpeg_worker_pb2_grpc.FFmpegServicer):  # pylint: disable=too-few-public-methods
     """Implements FFmpeg service"""
@@ -56,40 +58,14 @@ def run_ffmpeg(request: FFmpegRequest) -> Iterator[str]:
     Yields:
         A line of ffmpeg's output.
     """
-    with tempfile.TemporaryDirectory() as mount_point:
-        os.chdir(mount_point)
-        try:
-            _mount_buckets(request.buckets)
-            with subprocess.Popen(['ffmpeg', *request.ffmpeg_arguments],
-                                  stdout=subprocess.PIPE,
-                                  stderr=subprocess.STDOUT,
-                                  universal_newlines=True,
-                                  bufsize=1) as pipe:
-                for line in pipe.stdout:
-                    yield line
-        finally:
-            _unmount_buckets(request.buckets)
-
-
-def _mount_buckets(buckets: List[str]) -> None:
-    """Mounts GCS buckets in the current directory.
-
-    Args:
-        buckets: The names of the buckets to mount.
-    """
-    for bucket in buckets:
-        os.mkdir(bucket)
-        subprocess.run(['gcsfuse', bucket, bucket], check=True)
-
-
-def _unmount_buckets(buckets: List[str]) -> None:
-    """Unmounts GCS buckets in the current directory.
-
-    Args:
-        buckets: The names of the buckets to unmount.
-    """
-    for bucket in buckets:
-        subprocess.run(['fusermount', '-u', bucket], check=True)
+    os.chdir(MOUNT_POINT)
+    with subprocess.Popen(['ffmpeg', *request.ffmpeg_arguments],
+                          stdout=subprocess.PIPE,
+                          stderr=subprocess.STDOUT,
+                          universal_newlines=True,
+                          bufsize=1) as pipe:
+        for line in pipe.stdout:
+            yield line
 
 
 def serve():
