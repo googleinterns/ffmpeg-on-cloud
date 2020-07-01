@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ffmpeg-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ffmpeg-worker
+  template:
+    metadata:
+      labels:
+        app: ffmpeg-worker
+    spec:
+      containers:
+      - name: ffmpeg-worker
+        # Replace $GCLOUD_PROJECT with your project ID
+        image: gcr.io/$GCLOUD_PROJECT/ffmpeg-worker:latest
+        volumeMounts:
+        - mountPath: /buckets/
+          name: buckets
+          mountPropagation: HostToContainer
+        # This app listens on port 8080 for web traffic by default.
+        ports:
+        - containerPort: 8080
+      volumes:
+      - name: buckets
+        hostPath:
+          path: /home/buckets/
+          type: Directory
