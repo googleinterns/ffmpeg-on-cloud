@@ -21,6 +21,8 @@ The following is a sample command:
 python3 client.py -i my-bucket-1/input.mp4 my-bucket-2/output.avi
 """
 
+import argparse
+import os
 import sys
 
 import grpc
@@ -29,18 +31,28 @@ from ffmpeg_worker_pb2 import FFmpegRequest
 import ffmpeg_worker_pb2_grpc
 
 
-def main():
+def main(args, api_key):
     """Main driver for CLI."""
-    ffmpeg_arguments = sys.argv[1:]
-    channel = grpc.insecure_channel('localhost:8080')
+    channel = grpc.insecure_channel(f'{args.ip}:{args.port}')
     stub = ffmpeg_worker_pb2_grpc.FFmpegStub(channel)
-    for line in stub.transcode(
-            FFmpegRequest(ffmpeg_arguments=ffmpeg_arguments)):
+    for response in stub.transcode(
+            FFmpegRequest(ffmpeg_arguments=args.ffmpeg_arguments), metadata=[('x-api-key', api_key)]):
         if response.HasField('log_line'):
             print(response.log_line, end='')
         else:
             print(f'Exited with code {response.exit_code}')
 
 
+def get_api_key():
+    api_key = os.getenv('FFMPEG_API_KEY')
+    if api_key is None:
+        raise KeyError('FFMPEG_API_KEY environment variable not found')
+    return api_key
+
+
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('ip', help='IP address of the FFmpeg service')
+    parser.add_argument('--port', '-p', default=80, type=int, help='port of the FFmpeg service')
+    parser.add_argument('ffmpeg_arguments', nargs=argparse.REMAINDER, help='arguments to pass to ffmpeg')
+    main(parser.parse_args(), get_api_key())
