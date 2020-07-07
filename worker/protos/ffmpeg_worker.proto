@@ -5,7 +5,10 @@ service FFmpeg {
 }
 
 message FFmpegResponse {
-  string log_line = 1;
+  oneof status {
+    string log_line = 1;
+    int32 exit_code = 2;
+  }
 }
 
 message FFmpegRequest {

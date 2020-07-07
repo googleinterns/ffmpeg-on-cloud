@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x13\x66\x66mpeg_worker.proto\"\"\n\x0e\x46\x46mpegResponse\x12\x10\n\x08log_line\x18\x01 \x01(\t\")\n\rFFmpegRequest\x12\x18\n\x10\x66\x66mpeg_arguments\x18\x01 \x03(\t2:\n\x06\x46\x46mpeg\x12\x30\n\ttranscode\x12\x0e.FFmpegRequest\x1a\x0f.FFmpegResponse\"\x00\x30\x01\x62\x06proto3'
+  serialized_pb=b'\n\x13\x66\x66mpeg_worker.proto\"C\n\x0e\x46\x46mpegResponse\x12\x12\n\x08log_line\x18\x01 \x01(\tH\x00\x12\x13\n\texit_code\x18\x02 \x01(\x05H\x00\x42\x08\n\x06status\")\n\rFFmpegRequest\x12\x18\n\x10\x66\x66mpeg_arguments\x18\x01 \x03(\t2:\n\x06\x46\x46mpeg\x12\x30\n\ttranscode\x12\x0e.FFmpegRequest\x1a\x0f.FFmpegResponse\"\x00\x30\x01\x62\x06proto3'
 )
 
 
@@ -40,6 +40,13 @@ _FFMPEGRESPONSE = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='exit_code', full_name='FFmpegResponse.exit_code', index=1,
+      number=2, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -51,9 +58,14 @@ _FFMPEGRESPONSE = _descriptor.Descriptor(
   syntax='proto3',
   extension_ranges=[],
   oneofs=[
+    _descriptor.OneofDescriptor(
+      name='status', full_name='FFmpegResponse.status',
+      index=0, containing_type=None,
+      create_key=_descriptor._internal_create_key,
+    fields=[]),
   ],
   serialized_start=23,
-  serialized_end=57,
+  serialized_end=90,
 )
 
 
@@ -84,10 +96,16 @@ _FFMPEGREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=59,
-  serialized_end=100,
+  serialized_start=92,
+  serialized_end=133,
 )
 
+_FFMPEGRESPONSE.oneofs_by_name['status'].fields.append(
+  _FFMPEGRESPONSE.fields_by_name['log_line'])
+_FFMPEGRESPONSE.fields_by_name['log_line'].containing_oneof = _FFMPEGRESPONSE.oneofs_by_name['status']
+_FFMPEGRESPONSE.oneofs_by_name['status'].fields.append(
+  _FFMPEGRESPONSE.fields_by_name['exit_code'])
+_FFMPEGRESPONSE.fields_by_name['exit_code'].containing_oneof = _FFMPEGRESPONSE.oneofs_by_name['status']
 DESCRIPTOR.message_types_by_name['FFmpegResponse'] = _FFMPEGRESPONSE
 DESCRIPTOR.message_types_by_name['FFmpegRequest'] = _FFMPEGREQUEST
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
@@ -115,8 +133,8 @@ _FFMPEG = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=102,
-  serialized_end=160,
+  serialized_start=135,
+  serialized_end=193,
   methods=[
   _descriptor.MethodDescriptor(
     name='transcode',

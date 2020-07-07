@@ -36,7 +36,10 @@ def main():
     stub = ffmpeg_worker_pb2_grpc.FFmpegStub(channel)
     for line in stub.transcode(
             FFmpegRequest(ffmpeg_arguments=ffmpeg_arguments)):
-        print(line.log_line, end='')
+        if response.HasField('log_line'):
+            print(response.log_line, end='')
+        else:
+            print(f'Exited with code {response.exit_code}')
 
 
 if __name__ == '__main__':

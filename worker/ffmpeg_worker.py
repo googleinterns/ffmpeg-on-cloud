@@ -45,8 +45,12 @@ class FFmpegServicer(ffmpeg_worker_pb2_grpc.FFmpegServicer):  # pylint: disable=
         Yields:
             A Log object with a line of ffmpeg's output.
         """
-        for stdout_data in run_ffmpeg(request):
-            yield FFmpegResponse(log_line=stdout_data)
+        try:
+            for stdout_data in run_ffmpeg(request):
+                yield FFmpegResponse(log_line=stdout_data)
+            yield FFmpegResponse(exit_code=0)
+        except subprocess.CalledProcessError as error:
+            yield FFmpegResponse(exit_code=error.returncode)
 
 
 def run_ffmpeg(request: FFmpegRequest) -> Iterator[str]:
@@ -66,6 +70,9 @@ def run_ffmpeg(request: FFmpegRequest) -> Iterator[str]:
                           bufsize=1) as pipe:
         for line in pipe.stdout:
             yield line
+    if pipe.returncode != 0:
+        raise subprocess.CalledProcessError(cmd=pipe.args,
+                                            returncode=pipe.returncode)
 
 
 def serve():
