@@ -20,11 +20,27 @@ spec:
         - mountPath: /buckets/
           name: buckets
           mountPropagation: HostToContainer
-        # This app listens on port 8080 for web traffic by default.
         ports:
         - containerPort: 8080
+      - name: esp
+        image: gcr.io/endpoints-release/endpoints-runtime:1
+        args: [
+          "--http2_port=9000",
+          # Replace $GCLOUD_PROJECT with your project ID
+          "--service=ffmpeg.endpoints.$GCLOUD_PROJECT.cloud.goog",
+          "--rollout_strategy=managed",
+          "--backend=grpc://127.0.0.1:8080",
+          "--service_account_key=/etc/nginx/creds/service-account-creds.json"
+        ]
+        volumeMounts:
+        - mountPath: /etc/nginx/creds
+          name: service-account-creds
+          readOnly: true
       volumes:
       - name: buckets
         hostPath:
           path: /home/buckets/
           type: Directory
+      - name: service-account-creds
+        secret:
+          secretName: service-account-creds
