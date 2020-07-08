@@ -1,0 +1,4 @@
+resources:
+- worker/ffmpeg-worker-deployment.yaml
+- worker/ffmpeg-worker-service.yaml
+- gcsfuse-daemonset/gcsfuse-daemonset.yaml
