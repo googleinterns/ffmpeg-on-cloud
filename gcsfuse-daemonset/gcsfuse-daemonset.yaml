@@ -26,6 +26,9 @@ spec:
           # required for mounting FUSE
           # https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities
           privileged: true
+        # This command mounts the GCS bucket.
+        # The allow_other and --uid 999 are necessary to allow the ffmpeg-worker container to access the bucket.
+        # Specifically, it allows a user with the uid of 999 to access the bucket.
         # Replace $BUCKET_NAME with the name of the bucket to mount.
         command: ["/bin/bash", "-c", "mkdir -p /buckets/$BUCKET_NAME/ && gcsfuse -o allow_other --uid 999 --foreground $BUCKET_NAME /buckets/$BUCKET_NAME/"]
         lifecycle:
