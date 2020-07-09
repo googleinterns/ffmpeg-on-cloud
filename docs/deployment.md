@@ -22,79 +22,81 @@ gcloud container clusters get-credentials $CLUSTER_NAME
 
 You can also [enable Workload Identity on an existing cluster](https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity#enable_on_existing_cluster).
 
-5. Create a service account `gcsfuse` with the Storage Object Creator and Storage Object Viewer roles. Replace `$PROJECT_ID` with the project ID.
+5. Set up credentials for `gcsfuse`.
+   1. Create a service account `gcsfuse` with the Storage Object Creator and Storage Object Viewer roles. Replace `$PROJECT_ID` with the project ID.
 
-```sh
-gcloud iam service-accounts create gcsfuse
-gcloud projects add-iam-policy-binding $PROJECT_ID \
-    --member=serviceAccount:gcsfuse@$PROJECT_ID.iam.gserviceaccount.com --role=roles/storage.objectCreator
-gcloud projects add-iam-policy-binding $PROJECT_ID \
-    --member=serviceAccount:gcsfuse@$PROJECT_ID.iam.gserviceaccount.com --role=roles/storage.objectViewer
-```
+   ```sh
+   gcloud iam service-accounts create gcsfuse
+   gcloud projects add-iam-policy-binding $PROJECT_ID \
+       --member=serviceAccount:gcsfuse@$PROJECT_ID.iam.gserviceaccount.com --role=roles/storage.objectCreator
+   gcloud projects add-iam-policy-binding $PROJECT_ID \
+       --member=serviceAccount:gcsfuse@$PROJECT_ID.iam.gserviceaccount.com --role=roles/storage.objectViewer
+   ```
 
-6. Add policy binding to Kubernetes service account. Replace `$PROJECT_ID` with the project ID.
+   2. Add policy binding to Kubernetes service account. Replace `$PROJECT_ID` with the project ID.
 
-```sh
-kubectl create serviceaccount --namespace default gcsfuse
-gcloud iam service-accounts add-iam-policy-binding \
-  --role roles/iam.workloadIdentityUser \
-  --member "serviceAccount:$PROJECT_ID.svc.id.goog[default/gcsfuse]" \
-  gcsfuse@$PROJECT_ID.iam.gserviceaccount.com
-kubectl annotate serviceaccount \
-  --namespace default \
-  gcsfuse \
-  iam.gke.io/gcp-service-account=gcsfuse@$PROJECT_ID.iam.gserviceaccount.com
-```
+   ```sh
+   kubectl create serviceaccount --namespace default gcsfuse
+   gcloud iam service-accounts add-iam-policy-binding \
+     --role roles/iam.workloadIdentityUser \
+     --member "serviceAccount:$PROJECT_ID.svc.id.goog[default/gcsfuse]" \
+     gcsfuse@$PROJECT_ID.iam.gserviceaccount.com
+   kubectl annotate serviceaccount \
+     --namespace default \
+     gcsfuse \
+     iam.gke.io/gcp-service-account=gcsfuse@$PROJECT_ID.iam.gserviceaccount.com
+   ```
 
-7. Create a service account `endpoints` with the Service Controller and Cloud Trace Agent roles. Replace `$PROJECT_ID` with the project ID.
+6. Set up credentials for Cloud Endpoints.
+   1. Create a service account `endpoints` with the Service Controller and Cloud Trace Agent roles. Replace `$PROJECT_ID` with the project ID.
 
-```sh
-gcloud iam service-accounts create endpoints
-gcloud projects add-iam-policy-binding $PROJECT_ID \
-    --member=serviceAccount:endpoints@$PROJECT_ID.iam.gserviceaccount.com --role=roles/servicemanagement.serviceController
-gcloud projects add-iam-policy-binding $PROJECT_ID \
-    --member=serviceAccount:endpoints@$PROJECT_ID.iam.gserviceaccount.com --role=roles/cloudtrace.agent
-```
+   ```sh
+   gcloud iam service-accounts create endpoints
+   gcloud projects add-iam-policy-binding $PROJECT_ID \
+       --member=serviceAccount:endpoints@$PROJECT_ID.iam.gserviceaccount.com --role=roles/servicemanagement.serviceController
+   gcloud projects add-iam-policy-binding $PROJECT_ID \
+       --member=serviceAccount:endpoints@$PROJECT_ID.iam.gserviceaccount.com --role=roles/cloudtrace.agent
+   ```
 
-8. Create a service account key file for the `endpoints` service account. Replace `$PROJECT_ID` with the project ID.
+   2. Create a service account key file for the `endpoints` service account. Replace `$PROJECT_ID` with the project ID.
+   
+   ```sh
+   gcloud iam service-accounts keys create service-account-creds.json \
+     --iam-account endpoints@$PROJECT_ID.iam.gserviceaccount.com
+   ```
 
-```sh
-gcloud iam service-accounts keys create service-account-creds.json \
-  --iam-account endpoints@$PROJECT_ID.iam.gserviceaccount.com
-```
+   3. Create a Kubernetes secret from the service account key file.
 
-9. Create a Kubernetes secret from the service account key file.
+   ```sh
+   kubectl create secret generic service-account-creds \
+     --from-file=service-account-creds.json
+   ```
 
-```sh
-kubectl create secret generic service-account-creds \
-  --from-file=service-account-creds.json
-```
-
-10. Clone this repository.
+7. Clone this repository.
 
 ```sh
 git clone https://github.com/googleinterns/ffmpeg-on-cloud
 cd ffmpeg-on-cloud
 ```
 
-11. Deploy the Cloud Endpoints Service.
+8. Deploy the Cloud Endpoints Service.
 
 ```sh
 gcloud endpoints services deploy worker/api_descriptor.pb worker/api_config.yaml
 ```
 
-12. [Enable required services for Cloud Endpoints](https://cloud.google.com/endpoints/docs/quickstart-endpoints#enabling_required_services)
+9. [Enable required services for Cloud Endpoints](https://cloud.google.com/endpoints/docs/quickstart-endpoints#enabling_required_services)
 
-13. Build the containers needed with Cloud Build. Replace `$PROJECT_ID` with the project ID.
+10. Build the containers needed with Cloud Build. Replace `$PROJECT_ID` with the project ID.
 
 ```sh
 gcloud builds submit worker --tag=gcr.io/$PROJECT_ID/ffmpeg-worker
 gcloud builds submit worker --tag=gcr.io/$PROJECT_ID/gcsfuse
 ```
 
-14. Inside `gcsfuse-daemonset/gcsfuse-daemonset.yaml`, replace `$SERVICE_ACCOUNT` with `gcsfuse`, `$GCLOUD_PROJECT` with the project ID, `$BUCKET_NAME` with the GCS bucket you want to mount. Inside `worker/ffmpeg-worker-deployment.yaml`, replace `$GCLOUD_PROJECT` with the project ID.
+11. Inside `gcsfuse-daemonset/gcsfuse-daemonset.yaml`, replace `$SERVICE_ACCOUNT` with `gcsfuse`, `$GCLOUD_PROJECT` with the project ID, `$BUCKET_NAME` with the GCS bucket you want to mount. Inside `worker/ffmpeg-worker-deployment.yaml`, replace `$GCLOUD_PROJECT` with the project ID.
 
-15. Deploy Kubernetes objects.
+12. Deploy Kubernetes objects.
 
 ```sh
 kubectl apply -k .
