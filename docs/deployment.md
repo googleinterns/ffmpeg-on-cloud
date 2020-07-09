@@ -4,7 +4,7 @@
 
 2. Open the [Cloud Shell](https://console.cloud.google.com/home/dashboard?cloudshell=true) in the Cloud Console. All the commands in the following instructions should be run in the Cloud Shell. Alternatively, you can [install the Google Cloud SDK](https://cloud.google.com/sdk/docs) and run the commands in your local terminal.
 
-3. Set the project and compute zone.
+3. Set the project and compute zone. Replace `$COMPUTE_ZONE` and `$PROJECT_ID` with the [compute zone](https://cloud.google.com/compute/docs/regions-zones#available) and the project ID respectively.
 
 ```sh
 gcloud config set project $PROJECT_ID
