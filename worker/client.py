@@ -40,7 +40,7 @@ def main(args, api_key):
         if response.HasField('log_line'):
             print(response.log_line, end='')
         else:
-            print(f'Exited with code {response.exit_code}')
+            print(f'Exited with code {response.exit_status.exit_code}')
 
 
 def get_api_key():

@@ -7,8 +7,35 @@ service FFmpeg {
 message FFmpegResponse {
   oneof status {
     string log_line = 1;
-    int32 exit_code = 2;
+    ExitStatus exit_status = 2;
   }
+}
+
+message ExitStatus {
+  int32 exit_code = 1;
+  ResourceUsage resource_usage = 2;
+}
+
+// Represents the rusage struct
+// Detailed information about these values can be found in the following link:
+// https://manpages.debian.org/buster/manpages-dev/getrusage.2.en.html
+message ResourceUsage {
+  float ru_utime = 1;
+  float ru_stime = 2;
+  int64 ru_maxrss = 3;
+  int64 ru_ixrss = 4;
+  int64 ru_idrss = 5;
+  int64 ru_isrss = 6;
+  int64 ru_minflt = 7;
+  int64 ru_majflt = 8;
+  int64 ru_nswap = 9;
+  int64 ru_inblock = 10;
+  int64 ru_oublock = 11;
+  int64 ru_msgsnd = 12;
+  int64 ru_msgrcv = 13;
+  int64 ru_nsignals = 14;
+  int64 ru_nvcsw = 15;
+  int64 ru_nivcsw = 16;
 }
 
 message FFmpegRequest {
