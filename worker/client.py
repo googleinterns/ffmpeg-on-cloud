@@ -39,10 +39,12 @@ def main(args, api_key):
             FFmpegRequest(ffmpeg_arguments=args.ffmpeg_arguments), metadata=[('x-api-key', api_key)]):
         if response.HasField('log_line'):
             print(response.log_line, end='')
-        elif os.WIFEXITED(response.exit_status.exit_code):
-            print(f'Exited with code {os.WEXITSTATUS(response.exit_status.exit_code)}')
         else:
-            print(f'Killed by signal {os.WTERMSIG(response.exit_status.exit_code)}')
+            if os.WIFEXITED(response.exit_status.exit_code):
+                print(f'Exited with code {os.WEXITSTATUS(response.exit_status.exit_code)}')
+            else:
+                print(f'Killed by signal {os.WTERMSIG(response.exit_status.exit_code)}')
+            print(response.exit_status.resource_usage)
 
 
 
