@@ -88,9 +88,7 @@ class Process:
 
     def __iter__(self):
         yield from self._pipe.stdout
-        _, status, self.rusage = os.wait4(self._pipe.pid, 0)
-        self.returncode = (os.WEXITSTATUS(status) if os.WIFEXITED(status)
-                           else -os.WTERMSIG(status))
+        _, self.returncode, self.rusage = os.wait4(self._pipe.pid, 0)
 
 
 def serve():

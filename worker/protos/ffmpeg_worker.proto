@@ -12,6 +12,8 @@ message FFmpegResponse {
 }
 
 message ExitStatus {
+  // The exit status of the ffmpeg process as described in the link below:
+  // https://docs.python.org/3/library/os.html#os.wait
   int32 exit_code = 1;
   ResourceUsage resource_usage = 2;
 }
