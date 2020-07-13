@@ -77,18 +77,18 @@ class Process:
     """
 
     def __init__(self, args):
-        self._pipe = subprocess.Popen(args,
-                                      stdout=subprocess.PIPE,
-                                      stderr=subprocess.STDOUT,
-                                      universal_newlines=True,
-                                      bufsize=1)
+        self._subprocess = subprocess.Popen(args,
+                                            stdout=subprocess.PIPE,
+                                            stderr=subprocess.STDOUT,
+                                            universal_newlines=True,
+                                            bufsize=1)
         self.returncode = None
         self.rusage = None
 
 
     def __iter__(self):
-        yield from self._pipe.stdout
-        _, self.returncode, self.rusage = os.wait4(self._pipe.pid, 0)
+        yield from self._subprocess.stdout
+        _, self.returncode, self.rusage = os.wait4(self._subprocess.pid, 0)
 
 
 def serve():
