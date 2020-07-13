@@ -36,16 +36,18 @@ def main(args, api_key):
     channel = grpc.insecure_channel(f'{args.ip}:{args.port}')
     stub = ffmpeg_worker_pb2_grpc.FFmpegStub(channel)
     for response in stub.transcode(
-            FFmpegRequest(ffmpeg_arguments=args.ffmpeg_arguments), metadata=[('x-api-key', api_key)]):
+            FFmpegRequest(ffmpeg_arguments=args.ffmpeg_arguments),
+            metadata=[('x-api-key', api_key)]):
         if response.HasField('log_line'):
             print(response.log_line, end='')
         else:
             if os.WIFEXITED(response.exit_status.exit_code):
-                print(f'Exited with code {os.WEXITSTATUS(response.exit_status.exit_code)}')
+                print('Exited with code '
+                      f'{os.WEXITSTATUS(response.exit_status.exit_code)}')
             else:
-                print(f'Killed by signal {os.WTERMSIG(response.exit_status.exit_code)}')
+                print('Killed by signal '
+                      f'{os.WTERMSIG(response.exit_status.exit_code)}')
             print(response.exit_status.resource_usage)
-
 
 
 def get_api_key():
@@ -58,6 +60,12 @@ def get_api_key():
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('ip', help='IP address of the FFmpeg service')
-    parser.add_argument('--port', '-p', default=80, type=int, help='port of the FFmpeg service')
-    parser.add_argument('ffmpeg_arguments', nargs=argparse.REMAINDER, help='arguments to pass to ffmpeg')
+    parser.add_argument('--port',
+                        '-p',
+                        default=80,
+                        type=int,
+                        help='port of the FFmpeg service')
+    parser.add_argument('ffmpeg_arguments',
+                        nargs=argparse.REMAINDER,
+                        help='arguments to pass to ffmpeg')
     main(parser.parse_args(), get_api_key())

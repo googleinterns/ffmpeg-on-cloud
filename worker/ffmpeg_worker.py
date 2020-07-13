@@ -85,7 +85,6 @@ class Process:
         self.returncode = None
         self.rusage = None
 
-
     def __iter__(self):
         yield from self._subprocess.stdout
         _, self.returncode, self.rusage = os.wait4(self._subprocess.pid, 0)
