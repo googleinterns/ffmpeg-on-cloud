@@ -15,10 +15,10 @@
 """Client CLI for interacting with FFmpeg worker.
 
 The usage of the CLI is the following:
-python3 client.py ffmpeg-argument ...
+python3 client.py server-ip ffmpeg-argument ...
 
 The following is a sample command:
-python3 client.py -i my-bucket-1/input.mp4 my-bucket-2/output.avi
+python3 client.py 127.0.0.1 -i my-bucket-1/input.mp4 my-bucket-2/output.avi
 """
 
 import argparse
