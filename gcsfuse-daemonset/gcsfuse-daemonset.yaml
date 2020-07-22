@@ -10,6 +10,8 @@ spec:
     metadata:
       labels:
         name: gcsfuse
+        annotations:
+          cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
     spec:
       # Replace $SERVICE_ACCOUNT with service account name with GCS permissions that was configured with Workload Identity.
       # https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity

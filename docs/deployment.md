@@ -11,16 +11,20 @@ gcloud config set project $PROJECT_ID
 gcloud config set compute/zone $COMPUTE_ZONE
 ```
 
-4. Create a GKE cluster with [Workload Identity](https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity) enabled. Replace `$CLUSTER_NAME` and `$PROJECT_ID` with the name of the new cluster and the project ID respectively.
+4. Create a GKE cluster with [Workload Identity](https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity) and [cluster autoscaling](https://cloud.google.com/kubernetes-engine/docs/concepts/cluster-autoscaler) enabled. Replace `$CLUSTER_NAME` and `$PROJECT_ID` with the name of the new cluster and the project ID respectively.
 
 ```sh
 gcloud beta container clusters create $CLUSTER_NAME \
     --release-channel regular \
-    --workload-pool=$PROJECT_ID.svc.id.goog
+    --workload-pool=$PROJECT_ID.svc.id.goog \
+    --enable-autoscaling \
+    --min-nodes 3 \
+    --max-nodes 10
 gcloud container clusters get-credentials $CLUSTER_NAME
 ``` 
 
 You can also [enable Workload Identity on an existing cluster](https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity#enable_on_existing_cluster).
+You can also [enable cluster autoscaling on an existing node pool](https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-autoscaler#enabling_autoscaling_for_an_existing_node_pool).
 
 5. Set up credentials for `gcsfuse`.
    1. Create a service account `gcsfuse` with the Storage Object Creator and Storage Object Viewer roles. Replace `$PROJECT_ID` with the project ID.

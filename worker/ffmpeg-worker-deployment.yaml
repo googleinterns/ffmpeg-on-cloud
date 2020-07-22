@@ -10,6 +10,8 @@ spec:
   template:
     metadata:
       labels:
+        annotations:
+          cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
         app: ffmpeg-worker
     spec:
       containers:
