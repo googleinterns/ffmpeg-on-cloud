@@ -48,6 +48,7 @@ def main(args, api_key):
                 print('Killed by signal '
                       f'{os.WTERMSIG(response.exit_status.exit_code)}')
             print(response.exit_status.resource_usage)
+            print(f'Real time: {response.exit_status.real_time}')
 
 
 def get_api_key():

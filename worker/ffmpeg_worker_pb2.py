@@ -11,6 +11,7 @@ from google.protobuf import symbol_database as _symbol_database
 _sym_db = _symbol_database.Default()
 
 
+from google.protobuf import timestamp_pb2 as google_dot_protobuf_dot_timestamp__pb2
 
 
 DESCRIPTOR = _descriptor.FileDescriptor(
@@ -19,8 +20,9 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x13\x66\x66mpeg_worker.proto\"R\n\x0e\x46\x46mpegResponse\x12\x12\n\x08log_line\x18\x01 \x01(\tH\x00\x12\"\n\x0b\x65xit_status\x18\x02 \x01(\x0b\x32\x0b.ExitStatusH\x00\x42\x08\n\x06status\"G\n\nExitStatus\x12\x11\n\texit_code\x18\x01 \x01(\x05\x12&\n\x0eresource_usage\x18\x02 \x01(\x0b\x32\x0e.ResourceUsage\"\xbc\x02\n\rResourceUsage\x12\x10\n\x08ru_utime\x18\x01 \x01(\x02\x12\x10\n\x08ru_stime\x18\x02 \x01(\x02\x12\x11\n\tru_maxrss\x18\x03 \x01(\x03\x12\x10\n\x08ru_ixrss\x18\x04 \x01(\x03\x12\x10\n\x08ru_idrss\x18\x05 \x01(\x03\x12\x10\n\x08ru_isrss\x18\x06 \x01(\x03\x12\x11\n\tru_minflt\x18\x07 \x01(\x03\x12\x11\n\tru_majflt\x18\x08 \x01(\x03\x12\x10\n\x08ru_nswap\x18\t \x01(\x03\x12\x12\n\nru_inblock\x18\n \x01(\x03\x12\x12\n\nru_oublock\x18\x0b \x01(\x03\x12\x11\n\tru_msgsnd\x18\x0c \x01(\x03\x12\x11\n\tru_msgrcv\x18\r \x01(\x03\x12\x13\n\x0bru_nsignals\x18\x0e \x01(\x03\x12\x10\n\x08ru_nvcsw\x18\x0f \x01(\x03\x12\x11\n\tru_nivcsw\x18\x10 \x01(\x03\")\n\rFFmpegRequest\x12\x18\n\x10\x66\x66mpeg_arguments\x18\x01 \x03(\t2:\n\x06\x46\x46mpeg\x12\x30\n\ttranscode\x12\x0e.FFmpegRequest\x1a\x0f.FFmpegResponse\"\x00\x30\x01\x62\x06proto3'
-)
+  serialized_pb=b'\n\x13\x66\x66mpeg_worker.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"R\n\x0e\x46\x46mpegResponse\x12\x12\n\x08log_line\x18\x01 \x01(\tH\x00\x12\"\n\x0b\x65xit_status\x18\x02 \x01(\x0b\x32\x0b.ExitStatusH\x00\x42\x08\n\x06status\"v\n\nExitStatus\x12\x11\n\texit_code\x18\x01 \x01(\x05\x12&\n\x0eresource_usage\x18\x02 \x01(\x0b\x32\x0e.ResourceUsage\x12-\n\treal_time\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\"\xbc\x02\n\rResourceUsage\x12\x10\n\x08ru_utime\x18\x01 \x01(\x02\x12\x10\n\x08ru_stime\x18\x02 \x01(\x02\x12\x11\n\tru_maxrss\x18\x03 \x01(\x03\x12\x10\n\x08ru_ixrss\x18\x04 \x01(\x03\x12\x10\n\x08ru_idrss\x18\x05 \x01(\x03\x12\x10\n\x08ru_isrss\x18\x06 \x01(\x03\x12\x11\n\tru_minflt\x18\x07 \x01(\x03\x12\x11\n\tru_majflt\x18\x08 \x01(\x03\x12\x10\n\x08ru_nswap\x18\t \x01(\x03\x12\x12\n\nru_inblock\x18\n \x01(\x03\x12\x12\n\nru_oublock\x18\x0b \x01(\x03\x12\x11\n\tru_msgsnd\x18\x0c \x01(\x03\x12\x11\n\tru_msgrcv\x18\r \x01(\x03\x12\x13\n\x0bru_nsignals\x18\x0e \x01(\x03\x12\x10\n\x08ru_nvcsw\x18\x0f \x01(\x03\x12\x11\n\tru_nivcsw\x18\x10 \x01(\x03\")\n\rFFmpegRequest\x12\x18\n\x10\x66\x66mpeg_arguments\x18\x01 \x03(\t2:\n\x06\x46\x46mpeg\x12\x30\n\ttranscode\x12\x0e.FFmpegRequest\x1a\x0f.FFmpegResponse\"\x00\x30\x01\x62\x06proto3'
+  ,
+  dependencies=[google_dot_protobuf_dot_timestamp__pb2.DESCRIPTOR,])
 
 
 
@@ -64,8 +66,8 @@ _FFMPEGRESPONSE = _descriptor.Descriptor(
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=23,
-  serialized_end=105,
+  serialized_start=56,
+  serialized_end=138,
 )
 
 
@@ -91,6 +93,13 @@ _EXITSTATUS = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='real_time', full_name='ExitStatus.real_time', index=2,
+      number=3, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -103,8 +112,8 @@ _EXITSTATUS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=107,
-  serialized_end=178,
+  serialized_start=140,
+  serialized_end=258,
 )
 
 
@@ -240,8 +249,8 @@ _RESOURCEUSAGE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=181,
-  serialized_end=497,
+  serialized_start=261,
+  serialized_end=577,
 )
 
 
@@ -272,8 +281,8 @@ _FFMPEGREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=499,
-  serialized_end=540,
+  serialized_start=579,
+  serialized_end=620,
 )
 
 _FFMPEGRESPONSE.fields_by_name['exit_status'].message_type = _EXITSTATUS
@@ -284,6 +293,7 @@ _FFMPEGRESPONSE.oneofs_by_name['status'].fields.append(
   _FFMPEGRESPONSE.fields_by_name['exit_status'])
 _FFMPEGRESPONSE.fields_by_name['exit_status'].containing_oneof = _FFMPEGRESPONSE.oneofs_by_name['status']
 _EXITSTATUS.fields_by_name['resource_usage'].message_type = _RESOURCEUSAGE
+_EXITSTATUS.fields_by_name['real_time'].message_type = google_dot_protobuf_dot_timestamp__pb2._TIMESTAMP
 DESCRIPTOR.message_types_by_name['FFmpegResponse'] = _FFMPEGRESPONSE
 DESCRIPTOR.message_types_by_name['ExitStatus'] = _EXITSTATUS
 DESCRIPTOR.message_types_by_name['ResourceUsage'] = _RESOURCEUSAGE
@@ -327,8 +337,8 @@ _FFMPEG = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=542,
-  serialized_end=600,
+  serialized_start=622,
+  serialized_end=680,
   methods=[
   _descriptor.MethodDescriptor(
     name='transcode',

@@ -20,9 +20,11 @@ import logging
 import os
 import subprocess
 import tempfile
+import time
 from typing import Iterator
 from typing import List
 
+from google.protobuf.timestamp_pb2 import Timestamp
 import grpc
 
 from ffmpeg_worker_pb2 import ExitStatus
@@ -52,6 +54,7 @@ class FFmpegServicer(ffmpeg_worker_pb2_grpc.FFmpegServicer):  # pylint: disable=
             yield FFmpegResponse(log_line=stdout_data)
         yield FFmpegResponse(exit_status=ExitStatus(
             exit_code=process.returncode,
+            real_time=_time_to_timestamp(process.real_time),
             resource_usage=ResourceUsage(ru_utime=process.rusage.ru_utime,
                                          ru_stime=process.rusage.ru_stime,
                                          ru_maxrss=process.rusage.ru_maxrss,
@@ -77,17 +80,23 @@ class Process:
     """
 
     def __init__(self, args):
-        self._subprocess = subprocess.Popen(args,
+        self._start_time = None
+        self._args = args
+        self._subprocess = None
+        self.returncode = None
+        self.rusage = None
+        self.real_time = None
+
+    def __iter__(self):
+        self._start_time = time.time()
+        self._subprocess = subprocess.Popen(self._args,
                                             stdout=subprocess.PIPE,
                                             stderr=subprocess.STDOUT,
                                             universal_newlines=True,
                                             bufsize=1)
-        self.returncode = None
-        self.rusage = None
-
-    def __iter__(self):
         yield from self._subprocess.stdout
         _, self.returncode, self.rusage = os.wait4(self._subprocess.pid, 0)
+        self.real_time = time.time() - self._start_time
 
 
 def serve():
@@ -98,6 +107,12 @@ def serve():
     server.add_insecure_port('[::]:8080')
     server.start()
     server.wait_for_termination()
+
+
+def _time_to_timestamp(epoch_time: float) -> Timestamp:
+    seconds = int(epoch_time)
+    nanos = int((epoch_time - seconds) * 10**9)
+    return Timestamp(seconds=seconds, nanos=nanos)
 
 
 if __name__ == '__main__':
