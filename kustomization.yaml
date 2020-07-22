@@ -1,4 +1,5 @@
 resources:
 - worker/ffmpeg-worker-deployment.yaml
 - worker/ffmpeg-worker-service.yaml
+- worker/ffmpeg-worker-hpa.yaml
 - gcsfuse-daemonset/gcsfuse-daemonset.yaml
