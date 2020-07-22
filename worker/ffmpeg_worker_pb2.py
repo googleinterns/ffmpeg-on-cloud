@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x13\x66\x66mpeg_worker.proto\"\"\n\x0e\x46\x46mpegResponse\x12\x10\n\x08log_line\x18\x01 \x01(\t\":\n\rFFmpegRequest\x12\x18\n\x10\x66\x66mpeg_arguments\x18\x01 \x03(\t\x12\x0f\n\x07\x62uckets\x18\x02 \x03(\t2:\n\x06\x46\x46mpeg\x12\x30\n\ttranscode\x12\x0e.FFmpegRequest\x1a\x0f.FFmpegResponse\"\x00\x30\x01\x62\x06proto3'
+  serialized_pb=b'\n\x13\x66\x66mpeg_worker.proto\"R\n\x0e\x46\x46mpegResponse\x12\x12\n\x08log_line\x18\x01 \x01(\tH\x00\x12\"\n\x0b\x65xit_status\x18\x02 \x01(\x0b\x32\x0b.ExitStatusH\x00\x42\x08\n\x06status\"G\n\nExitStatus\x12\x11\n\texit_code\x18\x01 \x01(\x05\x12&\n\x0eresource_usage\x18\x02 \x01(\x0b\x32\x0e.ResourceUsage\"\xbc\x02\n\rResourceUsage\x12\x10\n\x08ru_utime\x18\x01 \x01(\x02\x12\x10\n\x08ru_stime\x18\x02 \x01(\x02\x12\x11\n\tru_maxrss\x18\x03 \x01(\x03\x12\x10\n\x08ru_ixrss\x18\x04 \x01(\x03\x12\x10\n\x08ru_idrss\x18\x05 \x01(\x03\x12\x10\n\x08ru_isrss\x18\x06 \x01(\x03\x12\x11\n\tru_minflt\x18\x07 \x01(\x03\x12\x11\n\tru_majflt\x18\x08 \x01(\x03\x12\x10\n\x08ru_nswap\x18\t \x01(\x03\x12\x12\n\nru_inblock\x18\n \x01(\x03\x12\x12\n\nru_oublock\x18\x0b \x01(\x03\x12\x11\n\tru_msgsnd\x18\x0c \x01(\x03\x12\x11\n\tru_msgrcv\x18\r \x01(\x03\x12\x13\n\x0bru_nsignals\x18\x0e \x01(\x03\x12\x10\n\x08ru_nvcsw\x18\x0f \x01(\x03\x12\x11\n\tru_nivcsw\x18\x10 \x01(\x03\")\n\rFFmpegRequest\x12\x18\n\x10\x66\x66mpeg_arguments\x18\x01 \x03(\t2:\n\x06\x46\x46mpeg\x12\x30\n\ttranscode\x12\x0e.FFmpegRequest\x1a\x0f.FFmpegResponse\"\x00\x30\x01\x62\x06proto3'
 )
 
 
@@ -40,6 +40,57 @@ _FFMPEGRESPONSE = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='exit_status', full_name='FFmpegResponse.exit_status', index=1,
+      number=2, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+    _descriptor.OneofDescriptor(
+      name='status', full_name='FFmpegResponse.status',
+      index=0, containing_type=None,
+      create_key=_descriptor._internal_create_key,
+    fields=[]),
+  ],
+  serialized_start=23,
+  serialized_end=105,
+)
+
+
+_EXITSTATUS = _descriptor.Descriptor(
+  name='ExitStatus',
+  full_name='ExitStatus',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='exit_code', full_name='ExitStatus.exit_code', index=0,
+      number=1, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='resource_usage', full_name='ExitStatus.resource_usage', index=1,
+      number=2, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -52,8 +103,145 @@ _FFMPEGRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=23,
-  serialized_end=57,
+  serialized_start=107,
+  serialized_end=178,
+)
+
+
+_RESOURCEUSAGE = _descriptor.Descriptor(
+  name='ResourceUsage',
+  full_name='ResourceUsage',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='ru_utime', full_name='ResourceUsage.ru_utime', index=0,
+      number=1, type=2, cpp_type=6, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='ru_stime', full_name='ResourceUsage.ru_stime', index=1,
+      number=2, type=2, cpp_type=6, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='ru_maxrss', full_name='ResourceUsage.ru_maxrss', index=2,
+      number=3, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='ru_ixrss', full_name='ResourceUsage.ru_ixrss', index=3,
+      number=4, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='ru_idrss', full_name='ResourceUsage.ru_idrss', index=4,
+      number=5, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='ru_isrss', full_name='ResourceUsage.ru_isrss', index=5,
+      number=6, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='ru_minflt', full_name='ResourceUsage.ru_minflt', index=6,
+      number=7, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='ru_majflt', full_name='ResourceUsage.ru_majflt', index=7,
+      number=8, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='ru_nswap', full_name='ResourceUsage.ru_nswap', index=8,
+      number=9, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='ru_inblock', full_name='ResourceUsage.ru_inblock', index=9,
+      number=10, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='ru_oublock', full_name='ResourceUsage.ru_oublock', index=10,
+      number=11, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='ru_msgsnd', full_name='ResourceUsage.ru_msgsnd', index=11,
+      number=12, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='ru_msgrcv', full_name='ResourceUsage.ru_msgrcv', index=12,
+      number=13, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='ru_nsignals', full_name='ResourceUsage.ru_nsignals', index=13,
+      number=14, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='ru_nvcsw', full_name='ResourceUsage.ru_nvcsw', index=14,
+      number=15, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='ru_nivcsw', full_name='ResourceUsage.ru_nivcsw', index=15,
+      number=16, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=181,
+  serialized_end=497,
 )
 
 
@@ -72,13 +260,6 @@ _FFMPEGREQUEST = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='buckets', full_name='FFmpegRequest.buckets', index=1,
-      number=2, type=9, cpp_type=9, label=3,
-      has_default_value=False, default_value=[],
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -91,11 +272,21 @@ _FFMPEGREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=59,
-  serialized_end=117,
+  serialized_start=499,
+  serialized_end=540,
 )
 
+_FFMPEGRESPONSE.fields_by_name['exit_status'].message_type = _EXITSTATUS
+_FFMPEGRESPONSE.oneofs_by_name['status'].fields.append(
+  _FFMPEGRESPONSE.fields_by_name['log_line'])
+_FFMPEGRESPONSE.fields_by_name['log_line'].containing_oneof = _FFMPEGRESPONSE.oneofs_by_name['status']
+_FFMPEGRESPONSE.oneofs_by_name['status'].fields.append(
+  _FFMPEGRESPONSE.fields_by_name['exit_status'])
+_FFMPEGRESPONSE.fields_by_name['exit_status'].containing_oneof = _FFMPEGRESPONSE.oneofs_by_name['status']
+_EXITSTATUS.fields_by_name['resource_usage'].message_type = _RESOURCEUSAGE
 DESCRIPTOR.message_types_by_name['FFmpegResponse'] = _FFMPEGRESPONSE
+DESCRIPTOR.message_types_by_name['ExitStatus'] = _EXITSTATUS
+DESCRIPTOR.message_types_by_name['ResourceUsage'] = _RESOURCEUSAGE
 DESCRIPTOR.message_types_by_name['FFmpegRequest'] = _FFMPEGREQUEST
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
@@ -105,6 +296,20 @@ FFmpegResponse = _reflection.GeneratedProtocolMessageType('FFmpegResponse', (_me
   # @@protoc_insertion_point(class_scope:FFmpegResponse)
   })
 _sym_db.RegisterMessage(FFmpegResponse)
+
+ExitStatus = _reflection.GeneratedProtocolMessageType('ExitStatus', (_message.Message,), {
+  'DESCRIPTOR' : _EXITSTATUS,
+  '__module__' : 'ffmpeg_worker_pb2'
+  # @@protoc_insertion_point(class_scope:ExitStatus)
+  })
+_sym_db.RegisterMessage(ExitStatus)
+
+ResourceUsage = _reflection.GeneratedProtocolMessageType('ResourceUsage', (_message.Message,), {
+  'DESCRIPTOR' : _RESOURCEUSAGE,
+  '__module__' : 'ffmpeg_worker_pb2'
+  # @@protoc_insertion_point(class_scope:ResourceUsage)
+  })
+_sym_db.RegisterMessage(ResourceUsage)
 
 FFmpegRequest = _reflection.GeneratedProtocolMessageType('FFmpegRequest', (_message.Message,), {
   'DESCRIPTOR' : _FFMPEGREQUEST,
@@ -122,8 +327,8 @@ _FFMPEG = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=119,
-  serialized_end=177,
+  serialized_start=542,
+  serialized_end=600,
   methods=[
   _descriptor.MethodDescriptor(
     name='transcode',

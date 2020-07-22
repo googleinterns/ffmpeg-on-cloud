@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: gcsfuse
+spec:
+  selector:
+      matchLabels:
+        name: gcsfuse
+  template:
+    metadata:
+      labels:
+        name: gcsfuse
+    spec:
+      # Replace $SERVICE_ACCOUNT with service account name with GCS permissions that was configured with Workload Identity.
+      # https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
+      serviceAccountName: $SERVICE_ACCOUNT
+      containers:
+      - name: gcsfuse
+        # Replace $GCLOUD_PROJECT with your project ID.
+        image: gcr.io/$GCLOUD_PROJECT/gcsfuse:latest
+        volumeMounts:
+        - mountPath: /buckets/
+          name: buckets
+          mountPropagation: Bidirectional
+        securityContext:
+          # required for mounting FUSE
+          # https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities
+          privileged: true
+        # This command mounts the GCS bucket.
+        # The allow_other and --uid 999 are necessary to allow the ffmpeg-worker container to access the bucket.
+        # The --stat-cache-ttl 0 --type-cache-ttl 0 disable caching to obtain consistency guarantees.
+        # More information about consistency and caching can be found in the link below:
+        # https://github.com/GoogleCloudPlatform/gcsfuse/blob/master/docs/semantics.md#caching
+        # Specifically, it allows a user with the uid of 999 to access the bucket.
+        # Replace $BUCKET_NAME with the name of the bucket to mount.
+        command: ["/bin/bash", "-c", "mkdir -p /buckets/$BUCKET_NAME/ && gcsfuse -o allow_other --stat-cache-ttl 0 --type-cache-ttl 0 --uid 999 --foreground $BUCKET_NAME /buckets/$BUCKET_NAME/"]
+        lifecycle:
+          preStop:
+            exec:
+              # Replace $BUCKET_NAME with the name of the bucket that was mounted.
+              command: ["/bin/bash", "-c", "fusermount -u /buckets/$BUCKET_NAME/; rm -r /buckets/$BUCKET_NAME/"]
+      volumes:
+      - name: buckets
+        hostPath:
+          path: /home/buckets/
+          type: DirectoryOrCreate

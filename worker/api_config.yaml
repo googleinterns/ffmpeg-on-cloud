@@ -1,0 +1,9 @@
+type: google.api.Service
+config_version: 3
+
+# Name of the service configuration.
+# Below, replace $GCLOUD_PROJECT with your Google Cloud Project ID.
+name: ffmpeg.endpoints.$GCLOUD_PROJECT.cloud.goog
+title: FFmpeg gRPC API
+apis:
+- name: FFmpeg

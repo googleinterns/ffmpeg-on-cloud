@@ -25,9 +25,13 @@ from typing import List
 
 import grpc
 
+from ffmpeg_worker_pb2 import ExitStatus
 from ffmpeg_worker_pb2 import FFmpegRequest
 from ffmpeg_worker_pb2 import FFmpegResponse
+from ffmpeg_worker_pb2 import ResourceUsage
 import ffmpeg_worker_pb2_grpc
+
+MOUNT_POINT = '/buckets/'
 
 
 class FFmpegServicer(ffmpeg_worker_pb2_grpc.FFmpegServicer):  # pylint: disable=too-few-public-methods
@@ -43,53 +47,47 @@ class FFmpegServicer(ffmpeg_worker_pb2_grpc.FFmpegServicer):  # pylint: disable=
         Yields:
             A Log object with a line of ffmpeg's output.
         """
-        for stdout_data in run_ffmpeg(request):
+        process = Process(['ffmpeg', *request.ffmpeg_arguments])
+        for stdout_data in process:
             yield FFmpegResponse(log_line=stdout_data)
+        yield FFmpegResponse(exit_status=ExitStatus(
+            exit_code=process.returncode,
+            resource_usage=ResourceUsage(ru_utime=process.rusage.ru_utime,
+                                         ru_stime=process.rusage.ru_stime,
+                                         ru_maxrss=process.rusage.ru_maxrss,
+                                         ru_ixrss=process.rusage.ru_ixrss,
+                                         ru_idrss=process.rusage.ru_idrss,
+                                         ru_isrss=process.rusage.ru_isrss,
+                                         ru_minflt=process.rusage.ru_minflt,
+                                         ru_majflt=process.rusage.ru_majflt,
+                                         ru_nswap=process.rusage.ru_nswap,
+                                         ru_inblock=process.rusage.ru_inblock,
+                                         ru_oublock=process.rusage.ru_oublock,
+                                         ru_msgsnd=process.rusage.ru_msgsnd,
+                                         ru_msgrcv=process.rusage.ru_msgrcv,
+                                         ru_nsignals=process.rusage.ru_nsignals,
+                                         ru_nvcsw=process.rusage.ru_nvcsw,
+                                         ru_nivcsw=process.rusage.ru_nivcsw)))
 
 
-def run_ffmpeg(request: FFmpegRequest) -> Iterator[str]:
-    """Runs ffmpeg according to the request and iterates over the output.
-
-    Args:
-        request: The request specifying how to run ffmpeg.
-
-    Yields:
-        A line of ffmpeg's output.
+class Process:
     """
-    with tempfile.TemporaryDirectory() as mount_point:
-        os.chdir(mount_point)
-        try:
-            _mount_buckets(request.buckets)
-            with subprocess.Popen(['ffmpeg', *request.ffmpeg_arguments],
-                                  stdout=subprocess.PIPE,
-                                  stderr=subprocess.STDOUT,
-                                  universal_newlines=True,
-                                  bufsize=1) as pipe:
-                for line in pipe.stdout:
-                    yield line
-        finally:
-            _unmount_buckets(request.buckets)
-
-
-def _mount_buckets(buckets: List[str]) -> None:
-    """Mounts GCS buckets in the current directory.
-
-    Args:
-        buckets: The names of the buckets to mount.
+    Wrapper class around subprocess.Popen class.
+    This class records the resource usage of the terminated process.
     """
-    for bucket in buckets:
-        os.mkdir(bucket)
-        subprocess.run(['gcsfuse', bucket, bucket], check=True)
 
+    def __init__(self, args):
+        self._subprocess = subprocess.Popen(args,
+                                            stdout=subprocess.PIPE,
+                                            stderr=subprocess.STDOUT,
+                                            universal_newlines=True,
+                                            bufsize=1)
+        self.returncode = None
+        self.rusage = None
 
-def _unmount_buckets(buckets: List[str]) -> None:
-    """Unmounts GCS buckets in the current directory.
-
-    Args:
-        buckets: The names of the buckets to unmount.
-    """
-    for bucket in buckets:
-        subprocess.run(['fusermount', '-u', bucket], check=True)
+    def __iter__(self):
+        yield from self._subprocess.stdout
+        _, self.returncode, self.rusage = os.wait4(self._subprocess.pid, 0)
 
 
 def serve():
@@ -103,5 +101,6 @@ def serve():
 
 
 if __name__ == '__main__':
+    os.chdir(MOUNT_POINT)
     logging.basicConfig()
     serve()
