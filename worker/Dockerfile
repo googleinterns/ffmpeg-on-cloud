@@ -8,7 +8,7 @@ RUN apt-get update \
 COPY requirements.txt .
 RUN pip install --requirement requirements.txt
 
-COPY . .
+COPY ffmpeg_worker.py ffmpeg_worker_pb2.py ffmpeg_worker_pb2_grpc.py ./
 
 # The UID below should match the UID used in the gcsfuse DaemonSet.
 RUN adduser ffmpeg-worker \
