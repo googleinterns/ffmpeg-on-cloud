@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
 
 service FFmpeg {
   rpc transcode(FFmpegRequest) returns (stream FFmpegResponse) {}
@@ -18,7 +18,7 @@ message ExitStatus {
   // https://docs.python.org/3/library/os.html#os.wait
   int32 exit_code = 1;
   ResourceUsage resource_usage = 2;
-  google.protobuf.Timestamp real_time = 3;
+  google.protobuf.Duration real_time = 3;
 }
 
 // Represents the rusage struct

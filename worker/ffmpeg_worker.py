@@ -24,7 +24,7 @@ import time
 from typing import Iterator
 from typing import List
 
-from google.protobuf.timestamp_pb2 import Timestamp
+from google.protobuf.duration_pb2 import Duration
 import grpc
 
 from ffmpeg_worker_pb2 import ExitStatus
@@ -54,7 +54,7 @@ class FFmpegServicer(ffmpeg_worker_pb2_grpc.FFmpegServicer):  # pylint: disable=
             yield FFmpegResponse(log_line=stdout_data)
         yield FFmpegResponse(exit_status=ExitStatus(
             exit_code=process.returncode,
-            real_time=_time_to_timestamp(process.real_time),
+            real_time=_time_to_duration(process.real_time),
             resource_usage=ResourceUsage(ru_utime=process.rusage.ru_utime,
                                          ru_stime=process.rusage.ru_stime,
                                          ru_maxrss=process.rusage.ru_maxrss,
@@ -109,10 +109,10 @@ def serve():
     server.wait_for_termination()
 
 
-def _time_to_timestamp(epoch_time: float) -> Timestamp:
-    seconds = int(epoch_time)
-    nanos = int((epoch_time - seconds) * 10**9)
-    return Timestamp(seconds=seconds, nanos=nanos)
+def _time_to_duration(seconds: float) -> Duration:
+    duration = Duration()
+    duration.FromNanoseconds(int(seconds * 10**9))
+    return duration
 
 
 if __name__ == '__main__':
