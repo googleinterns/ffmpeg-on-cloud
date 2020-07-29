@@ -40,12 +40,14 @@ def main(args, api_key):
     channel = grpc.insecure_channel(f'{args.ip}:{args.port}')
     stub = ffmpeg_worker_pb2_grpc.FFmpegStub(channel)
     writer = _get_writer(args.format, args.output_file)
-    for ffmpeg_arguments in _get_ffmpeg_commands(args):
-        writer.write_command(
-            ffmpeg_arguments,
-            stub.transcode(
-                FFmpegRequest(ffmpeg_arguments=args.ffmpeg_arguments),
-                metadata=[('x-api-key', api_key)]))
+    responses = stub.transcode(
+        FFmpegRequest(ffmpeg_arguments=args.ffmpeg_arguments),
+        metadata=[('x-api-key', api_key)])
+    try:
+        for ffmpeg_arguments in _get_ffmpeg_commands(args):
+            writer.write_command(ffmpeg_arguments, responses)
+    except KeyboardInterrupt:
+        responses.cancel()
     writer.close()
 
 
