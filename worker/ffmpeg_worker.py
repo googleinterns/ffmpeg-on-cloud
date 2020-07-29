@@ -20,6 +20,7 @@ import logging
 import os
 import subprocess
 import tempfile
+import threading
 import time
 from typing import Iterator
 from typing import List
@@ -34,6 +35,7 @@ from ffmpeg_worker_pb2 import ResourceUsage
 import ffmpeg_worker_pb2_grpc
 
 MOUNT_POINT = '/buckets/'
+_LOGGER = logging.getLogger(__name__)
 
 
 class FFmpegServicer(ffmpeg_worker_pb2_grpc.FFmpegServicer):  # pylint: disable=too-few-public-methods
@@ -49,8 +51,23 @@ class FFmpegServicer(ffmpeg_worker_pb2_grpc.FFmpegServicer):  # pylint: disable=
         Yields:
             A Log object with a line of ffmpeg's output.
         """
+        _LOGGER.info('Starting transcode.')
+        stop_event = threading.Event()
+
+        def handle_cancel():
+            _LOGGER.info('Cancel recieved.')
+            stop_event.set()
+
+        context.add_callback(handle_cancel)
         process = Process(['ffmpeg', *request.ffmpeg_arguments])
+        if stop_event.is_set():
+            _LOGGER.info('Stopping transcode.')
+            return
         for stdout_data in process:
+            if stop_event.is_set():
+                _LOGGER.info('Killing ffmpeg process.')
+                process.terminate()
+                return
             yield FFmpegResponse(log_line=stdout_data)
         yield FFmpegResponse(exit_status=ExitStatus(
             exit_code=process.returncode,
@@ -71,6 +88,7 @@ class FFmpegServicer(ffmpeg_worker_pb2_grpc.FFmpegServicer):  # pylint: disable=
                                          ru_nsignals=process.rusage.ru_nsignals,
                                          ru_nvcsw=process.rusage.ru_nvcsw,
                                          ru_nivcsw=process.rusage.ru_nivcsw)))
+        _LOGGER.info('Finished transcode.')
 
 
 class Process:
@@ -98,6 +116,12 @@ class Process:
         _, self.returncode, self.rusage = os.wait4(self._subprocess.pid, 0)
         self.real_time = time.time() - self._start_time
 
+    def terminate(self):
+        """Terminates the process with a SIGTERM signal."""
+        if self._subprocess is None:  # process has not been created yet
+            return
+        self._subprocess.terminate()
+
 
 def serve():
     """Starts the gRPC server"""
@@ -117,5 +141,5 @@ def _time_to_duration(seconds: float) -> Duration:
 
 if __name__ == '__main__':
     os.chdir(MOUNT_POINT)
-    logging.basicConfig()
+    logging.basicConfig(level=logging.INFO)
     serve()
