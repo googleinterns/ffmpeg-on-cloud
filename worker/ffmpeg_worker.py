@@ -59,7 +59,7 @@ class FFmpegServicer(ffmpeg_worker_pb2_grpc.FFmpegServicer):  # pylint: disable=
         cancel_event = threading.Event()
 
         def handle_cancel():
-            _LOGGER.info('Cancel recieved.')
+            _LOGGER.debug('Termination callback called.')
             cancel_event.set()
 
         context.add_callback(handle_cancel)
