@@ -18,7 +18,9 @@
 from concurrent import futures
 import logging
 import os
+import signal
 import subprocess
+import sys
 import tempfile
 import threading
 import time
@@ -36,6 +38,8 @@ import ffmpeg_worker_pb2_grpc
 
 MOUNT_POINT = '/buckets/'
 _LOGGER = logging.getLogger(__name__)
+_ABORT_EVENT = threading.Event()
+_GRACE_PERIOD = 20
 
 
 class FFmpegServicer(ffmpeg_worker_pb2_grpc.FFmpegServicer):  # pylint: disable=too-few-public-methods
@@ -52,19 +56,19 @@ class FFmpegServicer(ffmpeg_worker_pb2_grpc.FFmpegServicer):  # pylint: disable=
             A Log object with a line of ffmpeg's output.
         """
         _LOGGER.info('Starting transcode.')
-        stop_event = threading.Event()
+        cancel_event = threading.Event()
 
         def handle_cancel():
             _LOGGER.info('Cancel recieved.')
-            stop_event.set()
+            cancel_event.set()
 
         context.add_callback(handle_cancel)
         process = Process(['ffmpeg', *request.ffmpeg_arguments])
-        if stop_event.is_set():
+        if cancel_event.is_set():
             _LOGGER.info('Stopping transcode.')
             return
         for stdout_data in process:
-            if stop_event.is_set():
+            if cancel_event.is_set():
                 _LOGGER.info('Killing ffmpeg process.')
                 process.terminate()
                 return
@@ -129,6 +133,12 @@ def serve():
     ffmpeg_worker_pb2_grpc.add_FFmpegServicer_to_server(FFmpegServicer(),
                                                         server)
     server.add_insecure_port('[::]:8080')
+
+    def _sigterm_handler(*_):
+        _LOGGER.warning('Recieved SIGTERM. Terminating...')
+        server.stop(_GRACE_PERIOD)
+
+    signal.signal(signal.SIGTERM, _sigterm_handler)
     server.start()
     server.wait_for_termination()
 
