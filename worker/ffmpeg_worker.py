@@ -65,13 +65,21 @@ class FFmpegServicer(ffmpeg_worker_pb2_grpc.FFmpegServicer):  # pylint: disable=
         context.add_callback(handle_cancel)
         process = Process(['ffmpeg', *request.ffmpeg_arguments])
         if cancel_event.is_set():
-            _LOGGER.info('Stopping transcode.')
+            _LOGGER.info('Stopping transcode due to cancellation.')
+            return
+        if _ABORT_EVENT.is_set():
+            _LOGGER.info('Stopping transcode due to SIGTERM.')
+            context.abort(grpc.StatusCode.UNAVAILABLE, 'Request was killed with SIGTERM.')
             return
         for stdout_data in process:
             if cancel_event.is_set():
-                _LOGGER.info('Killing ffmpeg process.')
+                _LOGGER.info('Killing ffmpeg process due to cancellation.')
                 process.terminate()
                 return
+            if _ABORT_EVENT.is_set():
+                _LOGGER.info('Killing ffmpeg process due to SIGTERM.')
+                process.terminate()
+                break
             yield FFmpegResponse(log_line=stdout_data)
         yield FFmpegResponse(exit_status=ExitStatus(
             exit_code=process.returncode,
@@ -117,14 +125,19 @@ class Process:
                                             universal_newlines=True,
                                             bufsize=1)
         yield from self._subprocess.stdout
-        _, self.returncode, self.rusage = os.wait4(self._subprocess.pid, 0)
-        self.real_time = time.time() - self._start_time
+        self.wait()
 
     def terminate(self):
         """Terminates the process with a SIGTERM signal."""
         if self._subprocess is None:  # process has not been created yet
             return
         self._subprocess.terminate()
+        self.wait()
+
+    def wait(self):
+        """Waits for the process to finish and collects exit status information."""
+        _, self.returncode, self.rusage = os.wait4(self._subprocess.pid, 0)
+        self.real_time = time.time() - self._start_time
 
 
 def serve():
@@ -136,6 +149,7 @@ def serve():
 
     def _sigterm_handler(*_):
         _LOGGER.warning('Recieved SIGTERM. Terminating...')
+        _ABORT_EVENT.set()
         server.stop(_GRACE_PERIOD)
 
     signal.signal(signal.SIGTERM, _sigterm_handler)
