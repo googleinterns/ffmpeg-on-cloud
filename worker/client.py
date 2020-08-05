@@ -43,7 +43,7 @@ def main(args, api_key):
     try:
         for ffmpeg_arguments in _get_ffmpeg_commands(args):
             responses = stub.transcode(
-                FFmpegRequest(ffmpeg_arguments=args.ffmpeg_arguments),
+                FFmpegRequest(ffmpeg_arguments=ffmpeg_arguments),
                 metadata=[('x-api-key', api_key)])
             writer.write_command(ffmpeg_arguments, responses)
     except KeyboardInterrupt:
