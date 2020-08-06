@@ -54,6 +54,8 @@ def main(args, api_key):
 def _get_writer(output_format, output_file):
     if output_format == 'json':
         return JsonWriter(output_file)
+    elif output_format == 'tsv':
+        return TSVWriter(output_file)
     return NormalWriter(output_file)
 
 
@@ -155,6 +157,35 @@ class JsonWriter(ResponseWriter):
         super().close()
 
 
+class TSVWriter(ResponseWriter):
+    """Writes exit status of responses in tsv format."""
+
+    def __init__(self, output_file):
+        super().__init__(output_file)
+        print('Command',
+              'Exit Code',
+              'Real Time',
+              'User Time',
+              'System Time',
+              'Max RSS',
+              sep='\t',
+              file=self.output_file)
+
+
+    def write_command(self, command, responses):
+        for response in responses:
+            if response.HasField('exit_status'):
+                print(command,
+                      response.exit_status.exit_code,
+                      response.exit_status.real_time.ToNanoseconds() / 10**9,
+                      response.exit_status.resource_usage.ru_utime,
+                      response.exit_status.resource_usage.ru_stime,
+                      response.exit_status.resource_usage.ru_maxrss,
+                      sep='\t',
+                      file=self.output_file)
+                return
+
+
 def _convert_exit_code(exit_code):
     """Converts exit code returned by server to more understandable format"""
     if os.WIFEXITED(exit_code):
@@ -189,9 +220,10 @@ if __name__ == '__main__':
                         help='output file for ffmpeg service responses')
     parser.add_argument('--format',
                         '-f',
-                        choices=['normal', 'json'],
+                        choices=['normal', 'json', 'tsv'],
                         default='normal',
-                        help='format for ffmpeg service responses')
+                        help=('format for ffmpeg service responses'
+                              '; tsv just has certain exit status fields'))
     parser.add_argument('ffmpeg_arguments',
                         nargs=argparse.REMAINDER,
                         help='arguments to pass to ffmpeg')
