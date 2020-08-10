@@ -11,5 +11,9 @@ spec:
     targetPort: 9000
     protocol: TCP
     name: http2
+  - port: 8080
+    targetPort: 10000
+    protocol: TCP
+    name: http
   selector:
     app: ffmpeg-worker

@@ -35,6 +35,7 @@ spec:
         image: gcr.io/endpoints-release/endpoints-runtime:1
         args: [
           "--http2_port=9000",
+          "--http_port=10000",
           # Replace $GCLOUD_PROJECT with your project ID
           "--service=ffmpeg.endpoints.$GCLOUD_PROJECT.cloud.goog",
           "--rollout_strategy=managed",
