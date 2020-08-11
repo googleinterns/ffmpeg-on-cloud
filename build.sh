@@ -10,4 +10,5 @@ python3 -m grpc_tools.protoc \
     --descriptor_set_out=./api_descriptor.pb \
     --python_out=. \
     --grpc_python_out=. \
-    ./worker/ffmpeg_worker.proto
+    ./worker/ffmpeg_worker.proto \
+    ./async_worker/async_ffmpeg_worker.proto
