@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-import ffmpeg_worker_pb2 as ffmpeg__worker__pb2
+from worker import ffmpeg_worker_pb2 as worker_dot_ffmpeg__worker__pb2
 
 
 class FFmpegStub(object):
@@ -16,8 +16,8 @@ class FFmpegStub(object):
         """
         self.transcode = channel.unary_stream(
                 '/FFmpeg/transcode',
-                request_serializer=ffmpeg__worker__pb2.FFmpegRequest.SerializeToString,
-                response_deserializer=ffmpeg__worker__pb2.FFmpegResponse.FromString,
+                request_serializer=worker_dot_ffmpeg__worker__pb2.FFmpegRequest.SerializeToString,
+                response_deserializer=worker_dot_ffmpeg__worker__pb2.FFmpegResponse.FromString,
                 )
 
 
@@ -35,8 +35,8 @@ def add_FFmpegServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'transcode': grpc.unary_stream_rpc_method_handler(
                     servicer.transcode,
-                    request_deserializer=ffmpeg__worker__pb2.FFmpegRequest.FromString,
-                    response_serializer=ffmpeg__worker__pb2.FFmpegResponse.SerializeToString,
+                    request_deserializer=worker_dot_ffmpeg__worker__pb2.FFmpegRequest.FromString,
+                    response_serializer=worker_dot_ffmpeg__worker__pb2.FFmpegResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -59,7 +59,7 @@ class FFmpeg(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_stream(request, target, '/FFmpeg/transcode',
-            ffmpeg__worker__pb2.FFmpegRequest.SerializeToString,
-            ffmpeg__worker__pb2.FFmpegResponse.FromString,
+            worker_dot_ffmpeg__worker__pb2.FFmpegRequest.SerializeToString,
+            worker_dot_ffmpeg__worker__pb2.FFmpegResponse.FromString,
             options, channel_credentials,
             call_credentials, compression, wait_for_ready, timeout, metadata)

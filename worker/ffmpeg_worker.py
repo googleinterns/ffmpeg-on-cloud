@@ -30,11 +30,11 @@ from typing import List
 from google.protobuf.duration_pb2 import Duration
 import grpc
 
-from ffmpeg_worker_pb2 import ExitStatus
-from ffmpeg_worker_pb2 import FFmpegRequest
-from ffmpeg_worker_pb2 import FFmpegResponse
-from ffmpeg_worker_pb2 import ResourceUsage
-import ffmpeg_worker_pb2_grpc
+from worker.ffmpeg_worker_pb2 import ExitStatus
+from worker.ffmpeg_worker_pb2 import FFmpegRequest
+from worker.ffmpeg_worker_pb2 import FFmpegResponse
+from worker.ffmpeg_worker_pb2 import ResourceUsage
+from worker import ffmpeg_worker_pb2_grpc
 
 MOUNT_POINT = '/buckets/'
 _LOGGER = logging.getLogger(__name__)

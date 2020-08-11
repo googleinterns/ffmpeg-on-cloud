@@ -31,8 +31,8 @@ import sys
 from google.protobuf.json_format import MessageToJson
 import grpc
 
-from ffmpeg_worker_pb2 import FFmpegRequest
-import ffmpeg_worker_pb2_grpc
+from worker.ffmpeg_worker_pb2 import FFmpegRequest
+from worker import ffmpeg_worker_pb2_grpc
 
 
 def main(args, api_key):
