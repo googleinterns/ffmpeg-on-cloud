@@ -86,7 +86,7 @@ cd ffmpeg-on-cloud
 8. Deploy the Cloud Endpoints Service.
 
 ```sh
-gcloud endpoints services deploy worker/api_descriptor.pb worker/api_config.yaml
+gcloud endpoints services deploy ./api_descriptor.pb worker/api_config.yaml
 ```
 
 9. [Enable required services for Cloud Endpoints](https://cloud.google.com/endpoints/docs/quickstart-endpoints#enabling_required_services)
