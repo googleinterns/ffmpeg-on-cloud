@@ -1,9 +1,13 @@
+# This builder container should contain the ffmpeg binary that will be used
+FROM gcr.io/$GCLOUD_PROJECT/ffmpeg AS ffmpeg
+
 FROM python:3
 
 WORKDIR /usr/src/app
 
-RUN apt-get update \
-    && apt-get install -y ffmpeg
+COPY --from=ffmpeg /usr/grte/ /usr/grte/
+COPY --from=ffmpeg /ffmpeg/ /ffmpeg/
+ENV PATH="/ffmpeg:${PATH}"
 
 COPY requirements.txt .
 RUN pip install --requirement requirements.txt

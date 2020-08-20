@@ -120,6 +120,7 @@ class Process:
     def __iter__(self):
         self._start_time = time.time()
         self._subprocess = subprocess.Popen(self._args,
+                                            env={'LD_LIBRARY_PATH': '/usr/grte/v4/lib64/'},
                                             stdout=subprocess.PIPE,
                                             stderr=subprocess.STDOUT,
                                             universal_newlines=True,
