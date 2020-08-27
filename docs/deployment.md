@@ -105,3 +105,66 @@ gcloud builds submit worker --tag=gcr.io/$PROJECT_ID/gcsfuse
 ```sh
 kubectl apply -k .
 ```
+
+# Deploying Asynchronous FFmpeg Service
+
+These are steps for deploying the asynchronous service that is implemented in `async_worker`. This asynchronous service enqueues ffmpeg transcode tasks onto a Google Cloud Tasks queue. These steps should be completed after the steps for deploying the synchronous FFmpeg service above.
+
+1. [Create the Google Cloud Tasks queue](https://cloud.google.com/tasks/docs/creating-queues)
+
+```sh
+gcloud tasks queues create ffmpeg-tasks
+```
+
+2. Set up credentials for Google Cloud Tasks.
+
+   1. Create a service account `ffmpeg-tasks` with the Cloud Tasks Enqueuer, Cloud Tasks Viewer, and Service Account User roles. Replace `$PROJECT_ID` with the project ID.
+   
+   ```sh
+   gcloud iam service-accounts create ffmpeg-tasks
+   gcloud projects add-iam-policy-binding $PROJECT_ID \
+       --member=serviceAccount:endpoints@$PROJECT_ID.iam.gserviceaccount.com --role=roles/cloudtasks.enqueuer
+   gcloud projects add-iam-policy-binding $PROJECT_ID \
+       --member=serviceAccount:endpoints@$PROJECT_ID.iam.gserviceaccount.com --role=roles/cloudtasks.viewer
+   gcloud projects add-iam-policy-binding $PROJECT_ID \
+       --member=serviceAccount:endpoints@$PROJECT_ID.iam.gserviceaccount.com --role=roles/iam.serviceAccountUser
+   ```
+   
+   2. Add policy binding to Kubernetes service account. Replace `$PROJECT_ID` with the project ID.
+
+   ```sh
+   kubectl create serviceaccount ffmpeg-tasks
+   gcloud iam service-accounts add-iam-policy-binding \
+     --role roles/iam.workloadIdentityUser \
+     --member "serviceAccount:$PROJECT_ID.svc.id.goog[default/ffmpeg-tasks]" \
+     ffmpeg-tasks@$PROJECT_ID.iam.gserviceaccount.com
+   kubectl annotate serviceaccount \
+     --namespace default \
+     ffmpeg-tasks \
+     iam.gke.io/gcp-service-account=ffmpeg-tasks@$PROJECT_ID.iam.gserviceaccount.com
+   ```
+   
+   3. Replace `$SERVICE_ACCOUNT` in `async_worker/async_ffmpeg_worker_deployment.yaml` with `ffmpeg-tasks`
+
+3. Follow the instructions to [create an API key](https://cloud.google.com/docs/authentication/api-keys#creating_an_api_key) for the synchronous ffmpeg service that was deployed in the above steps.
+
+4. Create a Kubernetes secret with the synchronous FFmpeg service API key. Replace `$FFMPEG_API_KEY` with the synchronous ffmpeg service API key.
+   
+```sh
+kubectl create secret generic ffmpeg-api --from-literal=FFMPEG_API_KEY='$FFMPEG_API_KEY'
+```
+
+5. Replace `$GCLOUD_PROJECT`, `$QUEUE`, `$LOCATION`, `$FFMPEG_SERVICE_IP` with the project name, queue name, queue region, and the external synchronous ffmpeg service ip respectively in `async_worker/async_ffmpeg_worker_config.yaml`.
+
+6. Create the ConfigMap with the necessary configuration. 
+
+```sh
+kubectl create -f async_worker/async_ffmpeg_worker_config.yaml
+```
+
+7. Deploy the asyncronous workers deployment and service.
+
+```sh
+kubectl create -f async_worker/async_ffmpeg_worker_deployment.yaml
+kubectl create -f async_worker/async_ffmpeg_worker_service.yaml
+```
