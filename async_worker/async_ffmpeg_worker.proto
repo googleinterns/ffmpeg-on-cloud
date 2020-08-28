@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+import "worker/ffmpeg_worker.proto";
+
+service AsyncFFmpeg {
+  rpc transcode(AsyncFFmpegRequest) returns (AsyncFFmpegResponse) {}
+}
+
+message AsyncFFmpegRequest {
+  FFmpegRequest request = 1;
+}
+
+message AsyncFFmpegResponse {
+  // The task name can be used to check on tasks currently in the queue.
+  string task_name = 1;
+}

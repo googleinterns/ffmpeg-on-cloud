@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: async-ffmpeg-worker
+data:
+  project: "$GCLOUD_PROJECT"
+  queue: "$QUEUE"
+  location: "$LOCATION"
+  service-ip: "$FFMPEG_SERVICE_IP"

@@ -2,10 +2,10 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-from worker import ffmpeg_worker_pb2 as worker_dot_ffmpeg__worker__pb2
+from async_worker import async_ffmpeg_worker_pb2 as async__worker_dot_async__ffmpeg__worker__pb2
 
 
-class FFmpegStub(object):
+class AsyncFFmpegStub(object):
     """Missing associated documentation comment in .proto file."""
 
     def __init__(self, channel):
@@ -14,14 +14,14 @@ class FFmpegStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.transcode = channel.unary_stream(
-                '/FFmpeg/transcode',
-                request_serializer=worker_dot_ffmpeg__worker__pb2.FFmpegRequest.SerializeToString,
-                response_deserializer=worker_dot_ffmpeg__worker__pb2.FFmpegResponse.FromString,
+        self.transcode = channel.unary_unary(
+                '/AsyncFFmpeg/transcode',
+                request_serializer=async__worker_dot_async__ffmpeg__worker__pb2.AsyncFFmpegRequest.SerializeToString,
+                response_deserializer=async__worker_dot_async__ffmpeg__worker__pb2.AsyncFFmpegResponse.FromString,
                 )
 
 
-class FFmpegServicer(object):
+class AsyncFFmpegServicer(object):
     """Missing associated documentation comment in .proto file."""
 
     def transcode(self, request, context):
@@ -31,21 +31,21 @@ class FFmpegServicer(object):
         raise NotImplementedError('Method not implemented!')
 
 
-def add_FFmpegServicer_to_server(servicer, server):
+def add_AsyncFFmpegServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'transcode': grpc.unary_stream_rpc_method_handler(
+            'transcode': grpc.unary_unary_rpc_method_handler(
                     servicer.transcode,
-                    request_deserializer=worker_dot_ffmpeg__worker__pb2.FFmpegRequest.FromString,
-                    response_serializer=worker_dot_ffmpeg__worker__pb2.FFmpegResponse.SerializeToString,
+                    request_deserializer=async__worker_dot_async__ffmpeg__worker__pb2.AsyncFFmpegRequest.FromString,
+                    response_serializer=async__worker_dot_async__ffmpeg__worker__pb2.AsyncFFmpegResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'FFmpeg', rpc_method_handlers)
+            'AsyncFFmpeg', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
  # This class is part of an EXPERIMENTAL API.
-class FFmpeg(object):
+class AsyncFFmpeg(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
@@ -58,8 +58,8 @@ class FFmpeg(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_stream(request, target, '/FFmpeg/transcode',
-            worker_dot_ffmpeg__worker__pb2.FFmpegRequest.SerializeToString,
-            worker_dot_ffmpeg__worker__pb2.FFmpegResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/AsyncFFmpeg/transcode',
+            async__worker_dot_async__ffmpeg__worker__pb2.AsyncFFmpegRequest.SerializeToString,
+            async__worker_dot_async__ffmpeg__worker__pb2.AsyncFFmpegResponse.FromString,
             options, channel_credentials,
             call_credentials, compression, wait_for_ready, timeout, metadata)

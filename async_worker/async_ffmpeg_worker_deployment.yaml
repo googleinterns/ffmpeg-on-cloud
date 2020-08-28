@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: async-ffmpeg-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: async-ffmpeg-worker
+  template:
+    metadata:
+      labels:
+        annotations:
+          cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+        app: async-ffmpeg-worker
+    spec:
+      # Replace $SERVICE_ACCOUNT with service account name with Google Cloud Tasks permissions that was configured with Workload Identity.
+      # https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
+      serviceAccountName: $SERVICE_ACCOUNT
+      containers:
+      - name: async-ffmpeg-worker
+        # Replace $GCLOUD_PROJECT with your project ID
+        image: gcr.io/$GCLOUD_PROJECT/async-ffmpeg-worker:latest
+        ports:
+        - containerPort: 8080
+      env:
+        - name: FFMPEG_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: ffmpeg-api-key
+              key: api-key
+        - name: PROJECT
+          valueFrom:
+            configMapKeyRef:
+              name: async-ffmpeg-worker
+              key: project
+        - name: QUEUE
+          valueFrom:
+            configMapKeyRef:
+              name: async-ffmpeg-worker
+              key: queue
+        - name: LOCATION
+          valueFrom:
+            configMapKeyRef:
+              name: async-ffmpeg-worker
+              key: location
+        - name: SERVICE_IP
+          valueFrom:
+            configMapKeyRef:
+              name: async-ffmpeg-worker
+              key: service-ip
+      - name: esp
+        image: gcr.io/endpoints-release/endpoints-runtime:1
+        args: [
+          "--http2_port=9000",
+          # Replace $GCLOUD_PROJECT with your project ID
+          "--service=ffmpeg.endpoints.$GCLOUD_PROJECT.cloud.goog",
+          "--rollout_strategy=managed",
+          "--backend=grpc://127.0.0.1:8080",
+          "--service_account_key=/etc/nginx/creds/service-account-creds.json"
+        ]
+        volumeMounts:
+        - mountPath: /etc/nginx/creds
+          name: service-account-creds
+          readOnly: true
+      volumes:
+      - name: service-account-creds
+        secret:
+          secretName: service-account-creds
